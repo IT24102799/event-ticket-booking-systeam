@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Admin - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-inter">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-primary">Admin Panel</h1>
+        </div>
+        <nav class="mt-10">
+            <a th:href="@{/admin/dashboard}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-dashboard-line inline mr-2"></i> Dashboard
+            </a>
+            <a th:href="@{/admin/events}"
+               class="block py-2.5 px-4 rounded bg-primary text-white transition duration-200">
+                <i class="ri-calendar-line inline mr-2"></i> Events
+            </a>
+            <a th:href="@{/admin/users}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-user-line inline mr-2"></i> Users
+            </a>
+            <a href="#"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-settings-3-line inline mr-2"></i> Tickets
+            </a>
+            <!-- Logout button -->
+            <a th:href="@{/logout}"
+               class="block py-2.5 px-4 mt-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-logout-box-line inline mr-2"></i> Logout
+            </a>
+        </nav>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+        <header class="mb-8">
+            <h2 class="text-3xl font-bold text-secondary">Manage Events</h2>
+        </header>
+        <!-- Create Event Form -->
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold mb-4">Add New Event</h3>
+            <form th:action="@{/events/save}" method="post" class="bg-white p-6 rounded shadow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" name="name" required placeholder="Event Name"
+                           class="border px-4 py-2 rounded">
+                    <input type="text" name="venue" required placeholder="Venue" class="border px-4 py-2 rounded">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="datetime-local" name="startDateTime" required placeholder="Start Date & Time"
+                           class="border px-4 py-2 rounded">
+                    <input type="datetime-local" name="endDateTime" required placeholder="End Date & Time"
+                           class="border px-4 py-2 rounded">
+                </div>
+                <div class="mb-4">
+                    <input type="number" name="price" step="0.01" placeholder="Price" class="border px-4 py-2 rounded w-full">
+                </div>
+                <div class="mb-4">
+                    <input type="number" name="availableTickets" placeholder="Available Tickets" value="100" class="border px-4 py-2 rounded w-full">
+                </div>
+                <div class="mb-4">
+                    <input type="url" name="imageUrl" placeholder="Image URL"
+                           class="border px-4 py-2 rounded w-full">
+                </div>
+                <div class="mb-4">
+                        <textarea name="description" rows="4" placeholder="Event Description"
+                                  class="border px-4 py-2 rounded w-full"></textarea>
+                </div>
+                <button type="submit" class="bg-primary text-white px-6 py-2 rounded">Create Event</button>
+            </form>
+        </section>
+        <!-- List Events -->
+        <section>
+            <h3 class="text-xl font-semibold mb-4">Existing Events</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div th:if="${events.empty}" class="col-span-full">
+                    <div class="alert alert-info text-center p-8 bg-blue-50 text-blue-700 rounded-lg">No events available.</div>
+                </div>
+                <div th:each="event : ${events}" class="bg-white p-4 rounded shadow">
+                    <h4 class="font-bold mb-2" th:text="${event.name}">Event Name</h4>
+                    <p class="mb-2 text-sm" th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy h:mm a')} + ' - ' + ${#temporals.format(event.endDateTime, 'h:mm a')}">Date & Time</p>
+                    <p class="mb-2 text-sm" th:text="${event.venue}">Venue</p>
+                    <p class="mb-2 text-sm" th:text="'$' + ${event.price}">Price</p>
+                    <div class="flex space-x-2">
+                        <a th:href="@{/events/{id}/edit(id=${event.id})}" class="bg-blue-500 text-white px-3 py-1 rounded">Edit</a>
+                        <form th:action="@{/events/{id}/delete(id=${event.id})}" method="post" class="inline">
+                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
