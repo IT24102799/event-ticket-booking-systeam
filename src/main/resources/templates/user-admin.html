@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Admin - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-inter">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-primary">Admin Panel</h1>
+        </div>
+        <nav class="mt-10">
+            <a th:href="@{/admin/dashboard}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-dashboard-line inline mr-2"></i> Dashboard
+            </a>
+            <a th:href="@{/admin/events}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-calendar-line inline mr-2"></i> Events
+            </a>
+            <a th:href="@{/admin/users}"
+               class="block py-2.5 px-4 rounded bg-primary text-white transition duration-200">
+                <i class="ri-user-line inline mr-2"></i> Users
+            </a>
+            <a href="#"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-settings-3-line inline mr-2"></i> Tickets
+            </a>
+            <!-- Logout button -->
+            <a th:href="@{/logout}"
+               class="block py-2.5 px-4 mt-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-logout-box-line inline mr-2"></i> Logout
+            </a>
+        </nav>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+        <header class="mb-8">
+            <h2 class="text-3xl font-bold text-secondary">Manage Users</h2>
+        </header>
+        
+        <!-- Alert Messages -->
+        <div th:if="${message}" class="mb-6 p-4 bg-green-100 text-green-700 rounded-lg">
+            <p th:text="${message}">Success message</p>
+        </div>
+        <div th:if="${error}" class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+            <p th:text="${error}">Error message</p>
+        </div>
+        
+        <!-- Users Table -->
+        <section class="bg-white p-6 rounded shadow">
+            <h3 class="text-xl font-semibold mb-4">User List</h3>
+            
+            <div th:if="${users.empty}" class="text-center p-8 bg-blue-50 text-blue-700 rounded-lg">
+                No users available.
+            </div>
+            
+            <div th:unless="${users.empty}" class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-3 px-4 text-left">ID</th>
+                            <th class="py-3 px-4 text-left">Name</th>
+                            <th class="py-3 px-4 text-left">Email</th>
+                            <th class="py-3 px-4 text-left">Phone</th>
+                            <th class="py-3 px-4 text-left">Role</th>
+                            <th class="py-3 px-4 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}" class="border-b hover:bg-gray-50">
+                            <td class="py-3 px-4" th:text="${user.id}">1</td>
+                            <td class="py-3 px-4" th:text="${user.name}">John Doe</td>
+                            <td class="py-3 px-4" th:text="${user.email}">john@example.com</td>
+                            <td class="py-3 px-4" th:text="${user.phone}">+94 77 123 4567</td>
+                            <td class="py-3 px-4">
+                                <span th:if="${user.role == 'ADMIN'}" class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Admin</span>
+                                <span th:if="${user.role == 'USER'}" class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">User</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="flex space-x-2">
+                                    <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" class="inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
