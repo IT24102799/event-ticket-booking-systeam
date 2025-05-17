@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - YourTicket.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-sans">
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="index.html" class="text-primary text-2xl font-bold">
+            <span class="text-primary">YourTicket.lk</span>
+        </a>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-8">
+            <a href="events.html" class="text-gray-700 hover:text-primary transition-colors">Events</a>
+            <a href="about.html" class="text-gray-700 hover:text-primary transition-colors">About</a>
+            <a href="contact.html" class="text-gray-700 hover:text-primary transition-colors">Contact</a>
+        </nav>
+        <!-- Mobile Navigation Toggle -->
+        <div class="md:hidden">
+            <button id="mobileMenuButton" class="text-gray-700 hover:text-primary">
+                <i class="ri-menu-line text-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+        <div class="container mx-auto px-4 py-2">
+            <a href="index.html" class="block py-2 text-gray-600 hover:text-primary">Home</a>
+            <a href="events.html" class="block py-2 text-gray-600 hover:text-primary">Events</a>
+            <a href="about.html" class="block py-2 text-gray-600 hover:text-primary">About</a>
+            <a href="contact.html" class="block py-2 text-gray-600 hover:text-primary">Contact</a>
+            <a href="user.html" class="auth-link block py-2 text-gray-600 hover:text-primary">Login / Register</a>
+            <a href="user-profile.html" class="user-link block py-2 text-gray-600 hover:text-primary" style="display: none;">My Profile</a>
+            <a href="#" class="logout-link block py-2 text-gray-600 hover:text-primary" style="display: none;">Logout</a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8 pt-24 mb-12">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden p-6">
+            <!-- Auth Tabs -->
+            <div class="flex border-b mb-6">
+                <button id="login-tab" class="flex-1 py-3 font-medium text-center border-b-2 border-primary text-primary">Login</button>
+                <button id="register-tab" class="flex-1 py-3 font-medium text-center border-b-2 border-transparent text-gray-500">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form-container">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-gray-700 mb-2 font-medium">Email</label>
+                        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-gray-700 mb-2 font-medium">Password</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <p id="password-error" class="text-red-500 text-sm mt-1 hidden">Please fill out this field.</p>
+                    </div>
+                    <button id="login-button" type="submit" class="w-full bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Login</button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form-container" class="hidden">
+                <form id="register-form">
+                    <div class="mb-4">
+                        <label for="register-name" class="block text-gray-700 mb-2 font-medium">Full Name</label>
+                        <input type="text" id="register-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-email" class="block text-gray-700 mb-2 font-medium">Email</label>
+                        <input type="email" id="register-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <p id="email-error" class="text-red-500 text-sm mt-1 hidden">Email already in use</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-phone" class="block text-gray-700 mb-2 font-medium">Phone Number</label>
+                        <input type="tel" id="register-phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div class="mb-6">
+                        <label for="register-password" class="block text-gray-700 mb-2 font-medium">Password</label>
+                        <input type="password" id="register-password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <p id="password-strength" class="text-gray-500 text-sm mt-1">Password must be at least 6 characters</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="register-confirm-password" class="block text-gray-700 mb-2 font-medium">Confirm Password</label>
+                        <input type="password" id="register-confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <p id="password-match-error" class="text-red-500 text-sm mt-1 hidden">Passwords do not match</p>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white pt-12 pb-6">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">YourTicket.lk</h3>
+                <p class="text-gray-400 mb-4">Your one-stop destination for booking tickets to the best events in Sri Lanka.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                    <li><a href="events.html" class="text-gray-400 hover:text-white transition-colors">Events</a></li>
+                    <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-center text-gray-400">
+                        <i class="ri-map-pin-line mr-2"></i>
+                        <span>123 Main Street, Colombo, Sri Lanka</span>
+                    </li>
+                    <li class="flex items-center text-gray-400">
+                        <i class="ri-phone-line mr-2"></i>
+                        <span>+94 11 234 5678</span>
+                    </li>
+                    <li class="flex items-center text-gray-400">
+                        <i class="ri-mail-line mr-2"></i>
+                        <span>info@yourticket.lk</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-6">
+            <p class="text-center text-gray-400">&copy; 2023 YourTicket.lk. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Include user.js script -->
+<script src="/js/user.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Tab switching
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginFormContainer = document.getElementById('login-form-container');
+        const registerFormContainer = document.getElementById('register-form-container');
+
+        loginTab.addEventListener('click', function() {
+            loginTab.classList.add('border-primary', 'text-primary');
+            registerTab.classList.remove('border-primary', 'text-primary');
+            registerTab.classList.add('border-transparent', 'text-gray-500');
+
+            loginFormContainer.classList.remove('hidden');
+            registerFormContainer.classList.add('hidden');
+        });
+
+        registerTab.addEventListener('click', function() {
+            registerTab.classList.add('border-primary', 'text-primary');
+            loginTab.classList.remove('border-primary', 'text-primary');
+            loginTab.classList.add('border-transparent', 'text-gray-500');
+
+            registerFormContainer.classList.remove('hidden');
+            loginFormContainer.classList.add('hidden');
+        });
+
+        // Handle login form submission
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                // Simple validation
+                if (!email || !password) {
+                    document.getElementById('password-error').classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    console.log('Attempting to login with:', email);
+                    // Use the userService for login
+                    const userData = await window.userService.login(email, password);
+                    console.log('Login successful, user data:', userData);
+                    
+                    // Redirect to user profile
+                    window.location.href = '/user-profile';
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    alert('Login failed. Please check your credentials and try again.');
+                }
+            });
+        }
+    });
+</script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
