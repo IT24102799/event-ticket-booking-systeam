@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - YourTicket.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-primary text-2xl font-bold">
+                <span class="text-primary">YourTicket.lk</span>
+            </a>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="/events" class="text-gray-700 hover:text-primary transition-colors">Events</a>
+                <a href="/about" class="text-gray-700 hover:text-primary transition-colors">About</a>
+                <a href="/user" class="auth-link bg-primary text-white px-5 py-2 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors">Login / Register</a>
+                <div class="user-profile-menu relative" style="display: none;">
+                    <button id="user-menu-button" class="flex items-center space-x-1 bg-white border border-gray-300 rounded-md px-3 py-1.5 text-gray-700 hover:bg-gray-50 transition-colors">
+                        <span id="header-username">User</span>
+                        <i class="ri-arrow-down-s-line"></i>
+                    </button>
+                    <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
+                        <a href="/user-profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                        <a href="#" id="header-logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                    </div>
+                </div>
+            </nav>
+            <!-- Mobile Navigation Toggle -->
+            <div class="md:hidden">
+                <button id="mobileMenuButton" class="text-gray-700 hover:text-primary">
+                    <i class="ri-menu-line text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2">
+                <a href="/" class="block py-2 text-gray-600 hover:text-primary">Home</a>
+                <a href="/events" class="block py-2 text-gray-600 hover:text-primary">Events</a>
+                <a href="/about" class="block py-2 text-gray-600 hover:text-primary">About</a>
+                <a href="/user" class="auth-link block py-2 text-gray-600 hover:text-primary">Login / Register</a>
+                <div class="mobile-user-menu" style="display: none;">
+                    <span id="mobile-username" class="block py-2 text-gray-600 font-medium">User</span>
+                    <a href="/user-profile" class="block py-2 text-gray-600 hover:text-primary pl-4">My Profile</a>
+                    <a href="#" id="mobile-logout" class="block py-2 text-gray-600 hover:text-primary pl-4">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 pt-24 mb-12">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">User Profile</h2>
+                    
+                    <div id="loading-indicator" class="text-center py-8">
+                        <p class="text-gray-500">Loading user profile...</p>
+                    </div>
+                    
+                    <div id="profile-content" class="flex flex-col" style="display: none;">
+                        <!-- User Info -->
+                        <div class="mb-8">
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h3 id="user-name" class="text-xl font-semibold mb-4">Loading...</h3>
+                                <div class="space-y-3">
+                                    <p class="flex items-center text-gray-700">
+                                        <i class="ri-mail-line mr-3 text-primary"></i>
+                                        <span id="user-email">Loading...</span>
+                                    </p>
+                                    <p class="flex items-center text-gray-700">
+                                        <i class="ri-phone-line mr-3 text-primary"></i>
+                                        <span id="user-phone">Loading...</span>
+                                    </p>
+                                    <p class="flex items-center text-gray-700">
+                                        <i class="ri-user-settings-line mr-3 text-primary"></i>
+                                        <span id="user-role">Loading...</span>
+                                    </p>
+                                </div>
+                                <div class="mt-6 flex space-x-4">
+                                    <button id="edit-profile-btn" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Edit Profile</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tickets Section -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold mb-4">My Tickets</h3>
+                            <div id="tickets-container" class="space-y-4">
+                                <p class="text-gray-500">You haven't purchased any tickets yet.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Account Management -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Account Management</h3>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-gray-700 mb-4">Need to delete your account? This action cannot be undone.</p>
+                                <button id="delete-profile-btn" class="bg-red-500 text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Delete Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Edit Profile</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <form id="edit-profile-form">
+                <div class="mb-4">
+                    <label for="edit-name" class="block text-gray-700 mb-2 font-medium">Full Name</label>
+                    <input type="text" id="edit-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-email" class="block text-gray-700 mb-2 font-medium">Email</label>
+                    <input type="email" id="edit-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    <p id="edit-email-error" class="text-red-500 text-sm mt-1 hidden">Email already in use</p>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-phone" class="block text-gray-700 mb-2 font-medium">Phone Number</label>
+                    <input type="tel" id="edit-phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="edit-password" class="block text-gray-700 mb-2 font-medium">New Password (leave blank to keep current)</label>
+                    <input type="password" id="edit-password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-edit-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-100 transition-colors">Cancel</button>
+                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Delete Account</h3>
+                <button id="close-delete-modal-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <p class="mb-6 text-gray-700">Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-100 transition-colors">Cancel</button>
+                <button id="confirm-delete-btn" class="bg-red-500 text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">YourTicket.lk</h3>
+                    <p class="text-gray-400 mb-4">Your one-stop destination for booking tickets to the best events in Sri Lanka.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="ri-facebook-fill text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="ri-twitter-fill text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="ri-instagram-line text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="ri-linkedin-fill text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="/events" class="text-gray-400 hover:text-white transition-colors">Events</a></li>
+                        <li><a href="/about" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="/contact" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Event Categories</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/events?category=concerts" class="text-gray-400 hover:text-white transition-colors">Concerts</a></li>
+                        <li><a href="/events?category=theater" class="text-gray-400 hover:text-white transition-colors">Theater</a></li>
+                        <li><a href="/events?category=sports" class="text-gray-400 hover:text-white transition-colors">Sports</a></li>
+                        <li><a href="/events?category=workshops" class="text-gray-400 hover:text-white transition-colors">Workshops</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400">
+                            <i class="ri-map-pin-line mr-2"></i>
+                            <span>123 Main Street, Colombo, Sri Lanka</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="ri-phone-line mr-2"></i>
+                            <span>+94 11 234 5678</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="ri-mail-line mr-2"></i>
+                            <span>info@yourticket.lk</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-6">
+                <p class="text-center text-gray-400">&copy; 2023 YourTicket.lk. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Include the user.js file -->
+    <script src="/js/user.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing user profile page');
+            
+            // Show loading indicator
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const profileContent = document.getElementById('profile-content');
+            
+            // Check if user is logged in
+            function checkUserLogin() {
+                console.log('Checking if user is logged in');
+                const userJson = localStorage.getItem('user');
+                
+                if (!userJson) {
+                    console.log('No user found in localStorage, redirecting to login');
+                    window.location.href = '/user';
+                    return null;
+                }
+                
+                try {
+                    const user = JSON.parse(userJson);
+                    console.log('Found user in localStorage:', user);
+                    return user;
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    localStorage.removeItem('user');
+                    window.location.href = '/user';
+                    return null;
+                }
+            }
+            
+            // Get current user
+            const currentUser = checkUserLogin();
+            if (!currentUser) {
+                console.log('No current user, redirecting to login page');
+                return;
+            }
+            
+            // Display user information
+            function displayUserInfo(user) {
+                console.log('Displaying user info for:', user);
+                
+                // Update profile information
+                document.getElementById('user-name').textContent = user.name || 'N/A';
+                document.getElementById('user-email').textContent = user.email || 'N/A';
+                document.getElementById('user-phone').textContent = user.phone || 'N/A';
+                document.getElementById('user-role').textContent = user.role || 'USER';
+                
+                // Update header username
+                document.querySelectorAll('#header-username, #mobile-username').forEach(el => {
+                    el.textContent = user.name || 'User';
+                });
+                
+                // Populate edit form fields
+                document.getElementById('edit-name').value = user.name || '';
+                document.getElementById('edit-email').value = user.email || '';
+                document.getElementById('edit-phone').value = user.phone || '';
+                
+                // Hide loading indicator and show profile content
+                loadingIndicator.style.display = 'none';
+                profileContent.style.display = 'block';
+                
+                // Show user menu and hide auth link
+                document.querySelectorAll('.auth-link').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                document.querySelectorAll('.user-profile-menu, .mobile-user-menu').forEach(el => {
+                    el.style.display = '';
+                });
+            }
+            
+            // Display user data
+            displayUserInfo(currentUser);
+            
+            // Toggle mobile menu
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Toggle user dropdown menu
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (userMenuButton && userDropdown) {
+                userMenuButton.addEventListener('click', function() {
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuButton.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Handle logout
+            document.querySelectorAll('#header-logout, #mobile-logout').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Logging out user');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                });
+            });
+            
+            // Edit profile modal
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const editProfileModal = document.getElementById('edit-profile-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            
+            if (editProfileBtn && editProfileModal) {
+                editProfileBtn.addEventListener('click', function() {
+                    editProfileModal.classList.remove('hidden');
+                });
+                
+                closeModalBtn.addEventListener('click', function() {
+                    editProfileModal.classList.add('hidden');
+                });
+                
+                cancelEditBtn.addEventListener('click', function() {
+                    editProfileModal.classList.add('hidden');
+                });
+            }
+            
+            // Handle profile update
+            const editProfileForm = document.getElementById('edit-profile-form');
+            
+            if (editProfileForm) {
+                editProfileForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('edit-name').value;
+                    const email = document.getElementById('edit-email').value;
+                    const phone = document.getElementById('edit-phone').value;
+                    const password = document.getElementById('edit-password').value;
+                    
+                    // Simple validation
+                    if (!name || !email) {
+                        alert('Name and email are required');
+                        return;
+                    }
+                    
+                    try {
+                        // Prepare update data
+                        const updateData = {
+                            id: currentUser.id,
+                            name: name,
+                            email: email,
+                            phone: phone
+                        };
+                        
+                        // Only include password if provided
+                        if (password) {
+                            updateData.password = password;
+                        }
+                        
+                        console.log('Updating user profile with data:', updateData);
+                        
+                        // Update user profile using the userService
+                        const updatedUser = await window.userService.updateUser(currentUser.id, updateData);
+                        
+                        // Update localStorage
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                        
+                        // Update UI
+                        displayUserInfo(updatedUser);
+                        
+                        // Close modal
+                        editProfileModal.classList.add('hidden');
+                        
+                        alert('Profile updated successfully');
+                    } catch (error) {
+                        console.error('Error updating profile:', error);
+                        alert('Failed to update profile: ' + error.message);
+                    }
+                });
+            }
+            
+            // Delete account modal
+            const deleteProfileBtn = document.getElementById('delete-profile-btn');
+            const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+            const closeDeleteModalBtn = document.getElementById('close-delete-modal-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            
+            if (deleteProfileBtn && deleteConfirmModal) {
+                deleteProfileBtn.addEventListener('click', function() {
+                    deleteConfirmModal.classList.remove('hidden');
+                });
+                
+                closeDeleteModalBtn.addEventListener('click', function() {
+                    deleteConfirmModal.classList.add('hidden');
+                });
+                
+                cancelDeleteBtn.addEventListener('click', function() {
+                    deleteConfirmModal.classList.add('hidden');
+                });
+                
+                confirmDeleteBtn.addEventListener('click', async function() {
+                    try {
+                        console.log('Deleting user account:', currentUser.id);
+                        
+                        // Delete user account using the userService
+                        await window.userService.deleteUser(currentUser.id);
+                        
+                        // Clear user data and redirect
+                        localStorage.removeItem('user');
+                        
+                        alert('Your account has been deleted successfully');
+                        
+                        // Redirect to home page
+                        window.location.href = '/';
+                    } catch (error) {
+                        console.error('Error deleting account:', error);
+                        alert('Failed to delete account: ' + error.message);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
+
