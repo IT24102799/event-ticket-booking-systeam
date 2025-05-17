@@ -1,0 +1,4 @@
+1|Admin User|admin@yourticket.lk|+94 77 123 4567|admin123|ADMIN
+2|John Doe|john@example.com|+94 71 234 5678|password123|USER
+4|lakshan|lakshan@gmail.com|0123456789|password123|USER
+5|lakshan|a@gmail.com|11111111111|password123|USER
