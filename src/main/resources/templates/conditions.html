@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body class="bg-white">
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a th:href="@{/}" class="text-primary text-2xl font-bold">
+            <span class="text-primary">your tickets.lk</span>
+        </a>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-8">
+            <a th:href="@{/}" class="text-gray-700 hover:text-primary transition-colors">Home</a>
+            <a th:href="@{/events}" class="text-gray-700 hover:text-primary transition-colors">Events</a>
+            <a th:href="@{/about}" class="text-gray-700 hover:text-primary transition-colors">About</a>
+            <a href="#" class="bg-primary text-white px-5 py-2 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors">Login / Register</a>
+        </nav>
+        <!-- Mobile Navigation Toggle -->
+        <div class="md:hidden w-10 h-10 flex items-center justify-center">
+            <button class="text-gray-700 hover:text-primary">
+                <i class="ri-menu-line ri-lg"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Terms & Conditions Section -->
+<section class="pt-32 pb-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-secondary mb-6">Terms & Conditions</h1>
+            <p class="text-lg text-gray-700 mb-8">Please read these terms and conditions carefully before using our ticket booking services.</p>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">1. Acceptance of Terms</h2>
+                <p class="text-gray-700 mb-4">By accessing or using the Your Tickets.lk website and services, you agree to be bound by these Terms and Conditions. If you do not agree to all the terms and conditions, you may not access or use our services.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">2. Ticket Purchases</h2>
+                <p class="text-gray-700 mb-4">All ticket sales are final. No refunds or exchanges will be provided except in the case of event cancellation by the organizer.</p>
+                <p class="text-gray-700 mb-4">Tickets purchased through Your Tickets.lk are for personal use only and may not be resold or transferred without prior written consent from the event organizer.</p>
+                <p class="text-gray-700 mb-4">Your Tickets.lk reserves the right to cancel any ticket purchases that violate these terms.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">3. Event Cancellations and Changes</h2>
+                <p class="text-gray-700 mb-4">In the event of cancellation by the organizer, ticket holders will be entitled to a full refund of the ticket price.</p>
+                <p class="text-gray-700 mb-4">Event details such as date, time, venue, and lineup are subject to change. Your Tickets.lk will make reasonable efforts to notify ticket holders of any changes, but it is the responsibility of the ticket holder to check for updates.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">4. Privacy Policy</h2>
+                <p class="text-gray-700 mb-4">Your Tickets.lk collects and processes personal information in accordance with our Privacy Policy. By using our services, you consent to the collection and processing of your personal information as described in the Privacy Policy.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">5. Limitation of Liability</h2>
+                <p class="text-gray-700 mb-4">Your Tickets.lk is not responsible for the conduct of event organizers or attendees. We act solely as a ticketing platform and do not organize or host events.</p>
+                <p class="text-gray-700 mb-4">Your Tickets.lk shall not be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of our services.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-secondary mb-4">6. Contact Information</h2>
+                <p class="text-gray-700 mb-4">If you have any questions or concerns about these Terms and Conditions, please contact us at:</p>
+                <div class="flex items-center mb-2">
+                    <i class="ri-mail-line text-primary mr-3"></i>
+                    <span class="text-gray-700">support@yourtickets.lk</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="ri-phone-line text-primary mr-3"></i>
+                    <span class="text-gray-700">+94 11 234 5678</span>
+                </div>
+            </div>
+
+            <p class="text-gray-500 mt-8 text-sm">Last updated: May 16, 2025</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">Your Tickets.lk</h3>
+                <p class="text-gray-400 mb-4">Your one-stop platform for booking event tickets in Sri Lanka.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="ri-facebook-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="ri-twitter-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="ri-instagram-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="ri-linkedin-fill text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a th:href="@{/}" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                    <li><a th:href="@{/events}" class="text-gray-400 hover:text-white transition-colors">Events</a></li>
+                    <li><a th:href="@{/about}" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                    <li><a th:href="@{/conditions}" class="text-primary hover:text-white transition-colors">Terms & Conditions</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start">
+                        <i class="ri-map-pin-line text-primary mr-3 mt-1"></i>
+                        <span class="text-gray-400">123 Main Street, Colombo 03, Sri Lanka</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="ri-phone-line text-primary mr-3"></i>
+                        <span class="text-gray-400">+94 11 234 5678</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="ri-mail-line text-primary mr-3"></i>
+                        <span class="text-gray-400">support@yourtickets.lk</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+                <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates on upcoming events.</p>
+                <form class="flex">
+                    <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l focus:outline-none text-gray-800">
+                    <button type="submit" class="bg-primary px-4 py-2 rounded-r hover:bg-opacity-90 transition-colors">
+                        <i class="ri-send-plane-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Your Tickets.lk. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

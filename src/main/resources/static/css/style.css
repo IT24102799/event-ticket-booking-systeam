@@ -1,0 +1,126 @@
+/* Tailwind configuration */
+/* This is included in the HTML via CDN, but we're keeping the config here for reference */
+/*
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                primary: '#F74500',
+                secondary: '#1F2937'
+            },
+            borderRadius: {
+                'none': '0px',
+                'sm': '4px',
+                DEFAULT: '8px',
+                'md': '12px',
+                'lg': '16px',
+                'xl': '20px',
+                '2xl': '24px',
+                '3xl': '32px',
+                'full': '9999px',
+                'button': '8px'
+            }
+        }
+    }
+}
+*/
+
+/* Remix Icon Fix */
+:where([class^="ri-"])::before {
+    content: "\f3c2";
+}
+
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Form Elements */
+.search-bar:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(247, 69, 0, 0.2);
+}
+
+.contact-input:focus {
+    outline: none;
+    border-color: #F74500;
+}
+
+/* Cards */
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.review-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Auth Page Styles */
+.auth-container {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://readdy.ai/api/search-image?query=concert%2520venue%2520with%2520empty%2520seats%2520and%2520stage%2520with%2520soft%2520lighting%252C%2520professional%2520photography%252C%2520clean%2520modern%2520design%252C%2520minimalist%2520aesthetic%252C%2520soft%2520colors%252C%2520perfect%2520for%2520login%2520page%2520background%252C%2520blurred%2520background%2520with%2520bokeh%2520effect%252C%2520high%2520quality%2520professional%2520photograph&width=1920&height=1080&seq=10&orientation=landscape');
+    background-size: cover;
+    background-position: center;
+}
+
+.form-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(247, 69, 0, 0.2);
+}
+
+/* Password Strength Indicator */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9ca3af;
+}
+
+.password-toggle:hover {
+    color: #6b7280;
+}
+
+.password-strength {
+    height: 4px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    width: 25%;
+    background-color: #ef4444;
+}
+
+.strength-medium {
+    width: 50%;
+    background-color: #f59e0b;
+}
+
+.strength-strong {
+    width: 75%;
+    background-color: #10b981;
+}
+
+.strength-very-strong {
+    width: 100%;
+    background-color: #059669;
+}
+
+/* Custom Checkbox */
+.custom-checkbox .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${event.name} + ' - Your Tickets.lk'">Event Details - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none':'0px', 'sm':'4px', DEFAULT:'8px', 'md':'12px', 'lg':'16px', 'xl':'20px', '2xl':'24px', '3xl':'32px', 'full':'9999px', 'button':'8px' }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a th:href="@{/}" class="text-primary text-2xl font-bold">your tickets.lk</a>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a th:href="@{/}" class="text-gray-700 hover:text-primary transition-colors">Home</a>
+                <a th:href="@{/events}" class="text-gray-700 hover:text-primary transition-colors">Events</a>
+                <a th:href="@{/about}" class="text-gray-700 hover:text-primary transition-colors">About</a>
+            </nav>
+            <!-- Mobile Navigation Toggle -->
+            <div class="md:hidden w-10 h-10 flex items-center justify-center">
+                <button class="text-gray-700 hover:text-primary">
+                    <i class="ri-menu-line ri-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Event Details Section -->
+    <section class="pt-32 pb-16">
+        <div class="container mx-auto px-4">
+            <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
+                <span th:text="${message}"></span>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <!-- Event Image -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                        <div class="w-full overflow-hidden" style="max-width: 750px; max-height: 750px;">
+                            <img th:if="${event.imageUrl}" th:src="${event.imageUrl}" th:alt="${event.name}"
+                                 class="w-full h-auto" style="object-fit: cover; aspect-ratio: 1/1; max-width: 750px; max-height: 750px;">
+                            <div th:unless="${event.imageUrl}" class="w-full h-full bg-gray-100 text-center py-20 flex items-center justify-center" style="aspect-ratio: 1/1; min-height: 300px;">
+                                <i class="ri-calendar-event-line ri-4x text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h1 class="text-3xl font-bold text-secondary mb-2" th:text="${event.name}">Event Name</h1>
+                        <div class="flex flex-wrap gap-4 mb-6">
+                            <div class="flex items-center text-gray-600">
+                                <i class="ri-calendar-line mr-2"></i>
+                                <span th:text="${#temporals.format(event.startDateTime, 'EEEE, MMMM d, yyyy')}">Date</span>
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <i class="ri-time-line mr-2"></i>
+                                <span th:text="${#temporals.format(event.startDateTime, 'h:mm a')} + ' - ' + ${#temporals.format(event.endDateTime, 'h:mm a')}">Time</span>
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <i class="ri-map-pin-line mr-2"></i>
+                                <span th:text="${event.venue}">Venue</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h2 class="text-xl font-semibold text-secondary mb-2">Description</h2>
+                            <p class="text-gray-700" th:text="${event.description}">Event description goes here...</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold text-secondary mb-2">Ticket Information</h2>
+                                <a th:if="${event.hasMultipleTicketTypes}" th:href="@{/events/{id}/ticket-types(id=${event.id})}" class="text-sm text-blue-600 hover:text-blue-800">Manage Ticket Types</a>
+                            </div>
+
+                            <!-- Single ticket type (backward compatibility) -->
+                            <div th:if="${!event.hasMultipleTicketTypes}" class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <span class="text-gray-600 mr-2">Price:</span>
+                                    <span class="text-2xl font-bold text-primary" th:text="'$' + ${event.price}">$0.00</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-gray-600 mr-2">Available Tickets:</span>
+                                    <span class="font-semibold" th:text="${event.availableTickets}">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Multiple ticket types -->
+                            <div th:if="${event.hasMultipleTicketTypes}" class="space-y-4">
+                                <div th:each="ticketType : ${event.ticketTypes}" class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-semibold text-secondary" th:text="${ticketType.name}">Ticket Type</h3>
+                                            <p th:if="${ticketType.description}" class="text-sm text-gray-600 mt-1" th:text="${ticketType.description}">Description</p>
+                                        </div>
+                                        <span class="text-xl font-bold text-primary" th:text="'$' + ${ticketType.price}">$0.00</span>
+                                    </div>
+                                    <div class="mt-2 flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">
+                                            <span th:text="${ticketType.availableQuantity}">0</span> tickets available
+                                        </span>
+                                        <button class="bg-primary text-white px-4 py-1 rounded-md text-sm hover:bg-opacity-90 transition-colors">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-200">
+                            <a th:href="@{/events}" class="inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors mr-2">
+                                <i class="ri-arrow-left-line mr-1"></i> Back to Events
+                            </a>
+                            <a href="#" class="inline-block px-6 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-colors">
+                                Book Tickets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ticketQuantityInput = document.getElementById('ticketQuantity');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const pricePerTicket = parseFloat(totalPriceElement.textContent.replace('$', ''));
+            const decreaseButton = document.querySelector('button.decrease');
+            const increaseButton = document.querySelector('button.increase');
+
+            if(decreaseButton && increaseButton && ticketQuantityInput && totalPriceElement) {
+                decreaseButton.addEventListener('click', function() {
+                    let current = parseInt(ticketQuantityInput.value);
+                    if(current > 1) {
+                        ticketQuantityInput.value = --current;
+                        totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
+                    }
+                });
+                increaseButton.addEventListener('click', function() {
+                    let current = parseInt(ticketQuantityInput.value);
+                    ticketQuantityInput.value = ++current;
+                    totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

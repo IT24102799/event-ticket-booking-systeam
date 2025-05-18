@@ -1,0 +1,10 @@
+POST http://localhost:8080/api/reviews
+Content-Type: application/json
+
+{
+    "type": "platform",
+    "eventId": null,
+    "userName": "John Doe",
+    "rating": 5,
+    "comment": "Great platform!"
+}
