@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArConstructor
+@NoArgsConstructor
 
 public class Admin {
     private String adminId;

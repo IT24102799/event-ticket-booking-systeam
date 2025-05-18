@@ -1,0 +1,2 @@
+2|John Doe|john@example.com|+94 71 234 5678|password123|USER
+4|lakshan|lakshan@gmail.com|0123456789|password123|USER
