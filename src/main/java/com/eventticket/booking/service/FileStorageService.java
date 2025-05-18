@@ -4,6 +4,8 @@ import com.eventticket.booking.model.Admin;
 import com.eventticket.booking.model.Event;
 import com.eventticket.booking.model.TicketType;
 import com.eventticket.booking.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -31,9 +33,15 @@ public class FileStorageService {
     private final String TICKET_TYPE_COUNTER_FILE = "ticket_type_counter.txt";
     private final String ADMINS_FILE = "admins.txt";
 
+    private final ObjectMapper objectMapper;
+
     public FileStorageService() {
         // Create data directory if it doesn't exist
         createDataDirectory();
+
+        // Initialize ObjectMapper
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void createDataDirectory() {
@@ -68,10 +76,7 @@ public class FileStorageService {
             if (jsonContent.startsWith("[") && jsonContent.endsWith("]")) {
                 // Parse JSON array
                 try {
-                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-
-                    Event[] events = mapper.readValue(jsonContent, Event[].class);
+                    Event[] events = objectMapper.readValue(jsonContent, Event[].class);
                     for (Event event : events) {
                         eventMap.put(event.getId(), event);
                     }
@@ -121,9 +126,7 @@ public class FileStorageService {
             System.out.println("Events to save: " + events.size());
 
             // Save as JSON
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, events.values());
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, events.values());
             System.out.println("Events saved successfully in JSON format");
         } catch (IOException e) {
             System.err.println("Error saving events: " + e.getMessage());

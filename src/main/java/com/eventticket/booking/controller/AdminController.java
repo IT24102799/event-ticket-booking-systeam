@@ -43,17 +43,17 @@ public class AdminController {
     public String dashboard(Model model) {
         List<Event> events = eventService.getAllEvents();
         List<User> users = userService.getAllUsers();
-        
+
         model.addAttribute("eventCount", events.size());
         model.addAttribute("userCount", users.size());
-        
+
         // Get recent users (up to 5)
         List<User> recentUsers = users.stream()
                 .sorted(Comparator.comparing(User::getId).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
         model.addAttribute("recentUsers", recentUsers);
-        
+
         return "dashboard-admin";
     }
 
@@ -64,32 +64,37 @@ public class AdminController {
         return "event-admin";
     }
 
+    @GetMapping("/admin-management")
+    public String adminManagement() {
+        return "admin-management";
+    }
+
     @Autowired
     private AdminService adminService;
 
 
-    @GetMapping
+    @GetMapping("/api/admins")
     public ResponseEntity<List<Admin>> getAllAdmins() {
         List<Admin> admins = adminService.getAllAdmins();
         return ResponseEntity.ok(admins);
     }
 
 
-    @GetMapping("/{adminId}")
+    @GetMapping("/api/admins/{adminId}")
     public ResponseEntity<Admin> getAdminById(@PathVariable String adminId) {
         Optional<Admin> admin = adminService.getAdminById(adminId);
         return admin.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 
-    @PostMapping
+    @PostMapping("/api/admins")
     public ResponseEntity<String> addAdmin(@RequestBody Admin admin) {
         adminService.addAdmin(admin);
         return ResponseEntity.status(HttpStatus.CREATED).body("Admin added successfully");
     }
 
 
-    @DeleteMapping("/{adminId}")
+    @DeleteMapping("/api/admins/{adminId}")
     public ResponseEntity<String> deleteAdmin(@PathVariable String adminId) {
         Optional<Admin> admin = adminService.getAdminById(adminId);
         if (admin.isPresent()) {
@@ -100,7 +105,7 @@ public class AdminController {
     }
 
 
-    @PutMapping("/{adminId}")
+    @PutMapping("/api/admins/{adminId}")
     public ResponseEntity<String> updateAdmin(@PathVariable String adminId, @RequestBody Admin updatedAdmin) {
         Optional<Admin> admin = adminService.getAdminById(adminId);
         if (admin.isPresent()) {
