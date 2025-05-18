@@ -1,5 +1,6 @@
 package com.eventticket.booking.service;
 
+import com.eventticket.booking.model.Admin;
 import com.eventticket.booking.model.Event;
 import com.eventticket.booking.model.TicketType;
 
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,6 +24,7 @@ public class FileStorageService {
     private final String TICKET_TYPES_FILE = "ticket_types.txt";
     private final String COUNTER_FILE = "counter.txt";
     private final String TICKET_TYPE_COUNTER_FILE = "ticket_type_counter.txt";
+    private final String ADMINS_FILE = "admins.txt";
 
     private final ObjectMapper objectMapper;
 
@@ -155,6 +159,37 @@ public class FileStorageService {
         try {
             File file = new File(DATA_DIR + File.separator + TICKET_TYPE_COUNTER_FILE);
             objectMapper.writeValue(file, counter.get());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Admin> readAdmins() {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            if (!file.exists()) {
+                return new ArrayList<>();
+            }
+
+            Admin[] admins = objectMapper.readValue(file, Admin[].class);
+            List<Admin> adminList = new ArrayList<>();
+            for (Admin admin : admins) {
+                adminList.add(admin);
+            }
+            return adminList;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+
+    public void writeAdmins(List<Admin> admins) {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            objectMapper.writeValue(file, admins);
         } catch (IOException e) {
             e.printStackTrace();
         }
