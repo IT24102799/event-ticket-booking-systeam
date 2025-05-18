@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Management - Your Tickets.lk</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#F74500', secondary: '#1F2937' },
+          borderRadius: { DEFAULT: '8px' }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+</head>
+<body class="bg-gray-100 font-inter">
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md">
+    <div class="p-6">
+      <h1 class="text-2xl font-bold text-primary">Admin Panel</h1>
+    </div>
+    <nav class="mt-10">
+      <a href="dashboard-admin.html" class="block py-2.5 px-4 rounded hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-dashboard-line mr-2"></i> Dashboard
+      </a>
+      <a href="event-admin.html" class="block py-2.5 px-4 rounded hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-calendar-line mr-2"></i> Events
+      </a>
+      <a href="user-admin.html" class="block py-2.5 px-4 rounded hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-user-line mr-2"></i> Users
+      </a>
+      <a href="#" class="block py-2.5 px-4 rounded hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-settings-3-line mr-2"></i> Tickets
+      </a>
+      <a href="admin-management.html" class="block py-2.5 px-4 rounded bg-primary text-white">
+        <i class="ri-admin-line mr-2"></i> Admins
+      </a>
+      <a href="index.html" class="block py-2.5 px-4 mt-4 rounded hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-logout-box-line mr-2"></i> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-10">
+    <header class="mb-8">
+      <h2 class="text-3xl font-bold text-secondary">Admin management</h2>
+    </header>
+
+    <!-- Add Admin Form -->
+    <div class="bg-white p-6 rounded shadow mb-8">
+      <h3 class="text-xl font-semibold mb-4">Add / Update Admin</h3>
+      <form id="adminForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <input type="hidden" id="adminId" />
+        <input type="text" id="inputId" placeholder="Admin ID" class="border p-2 rounded" required />
+        <input type="text" id="inputUser" placeholder="Username" class="border p-2 rounded" required />
+        <input type="password" id="inputPass" placeholder="Password" class="border p-2 rounded" required />
+        <button type="submit" class="bg-primary text-white px-4 py-2 rounded">Save</button>
+      </form>
+    </div>
+
+    <!-- Admins Table -->
+    <div class="bg-white p-6 rounded shadow">
+      <h3 class="text-xl font-semibold mb-4">Admin List</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left">
+          <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="py-2 px-4">Admin ID</th>
+            <th class="py-2 px-4">Username</th>
+            <th class="py-2 px-4">Actions</th>
+          </tr>
+          </thead>
+          <tbody id="adminTableBody">
+          <!-- Dynamic rows go here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- CRUD Script -->
+<script>
+  const form = document.getElementById('adminForm');
+  const tableBody = document.getElementById('adminTableBody');
+  let admins = JSON.parse(localStorage.getItem('admins') || '[]');
+
+  function renderAdmins() {
+    tableBody.innerHTML = '';
+    admins.forEach((admin, index) => {
+      tableBody.innerHTML += `
+        <tr class="border-b">
+          <td class="py-2 px-4">${admin.adminId}</td>
+          <td class="py-2 px-4">${admin.userName}</td>
+          <td class="py-2 px-4">
+            <button onclick="editAdmin(${index})" class="text-blue-600 hover:underline">Edit</button>
+            <button onclick="deleteAdmin(${index})" class="text-red-600 hover:underline ml-4">Delete</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function saveAdmins() {
+    localStorage.setItem('admins', JSON.stringify(admins));
+    renderAdmins();
+    form.reset();
+    document.getElementById('adminId').value = '';
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('inputId').value;
+    const user = document.getElementById('inputUser').value;
+    const pass = document.getElementById('inputPass').value;
+    const hiddenId = document.getElementById('adminId').value;
+
+    if (hiddenId) {
+      const idx = admins.findIndex(a => a.adminId === hiddenId);
+      admins[idx] = { adminId: id, userName: user, password: pass };
+    } else {
+      if (admins.some(a => a.adminId === id)) {
+        alert('Admin ID must be unique.');
+        return;
+      }
+      admins.push({ adminId: id, userName: user, password: pass });
+    }
+
+    saveAdmins();
+  });
+
+  function editAdmin(index) {
+    const admin = admins[index];
+    document.getElementById('adminId').value = admin.adminId;
+    document.getElementById('inputId').value = admin.adminId;
+    document.getElementById('inputUser').value = admin.userName;
+    document.getElementById('inputPass').value = admin.password;
+  }
+
+  function deleteAdmin(index) {
+    if (confirm('Are you sure you want to delete this admin?')) {
+      admins.splice(index, 1);
+      saveAdmins();
+    }
+  }
+
+  renderAdmins();
+</script>
+</body>
+</html>
