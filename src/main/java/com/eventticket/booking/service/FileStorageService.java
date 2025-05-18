@@ -1,5 +1,6 @@
 package com.eventticket.booking.service;
 
+import com.eventticket.booking.model.Admin;
 import com.eventticket.booking.model.Event;
 import com.eventticket.booking.model.TicketType;
 import com.eventticket.booking.model.User;
@@ -11,6 +12,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,6 +29,7 @@ public class FileStorageService {
     private final String USER_COUNTER_FILE = "user_counter.txt";
     private final String TICKET_TYPES_FILE = "ticket_types.txt";
     private final String TICKET_TYPE_COUNTER_FILE = "ticket_type_counter.txt";
+    private final String ADMINS_FILE = "admins.txt";
 
     public FileStorageService() {
         // Create data directory if it doesn't exist
@@ -376,6 +380,37 @@ public class FileStorageService {
             }
         } catch (IOException e) {
             System.err.println("Error saving ticket type counter: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public List<Admin> readAdmins() {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            if (!file.exists()) {
+                return new ArrayList<>();
+            }
+
+            Admin[] admins = objectMapper.readValue(file, Admin[].class);
+            List<Admin> adminList = new ArrayList<>();
+            for (Admin admin : admins) {
+                adminList.add(admin);
+            }
+            return adminList;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+
+    public void writeAdmins(List<Admin> admins) {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            objectMapper.writeValue(file, admins);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
