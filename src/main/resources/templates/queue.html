@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Status - your tickets.lk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/templates/styles.css}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#F74500',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="bg-white py-4 border-b border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <a th:href="@{/}" class="text-primary text-2xl font-bold">your tickets.lk</a>
+                <div class="hidden md:flex space-x-8">
+                    <a th:href="@{/}" class="text-gray-600 hover:text-primary transition">Home</a>
+                    <a th:href="@{/events}" class="text-gray-600 hover:text-primary transition">Events</a>
+                    <a th:href="@{/about}" class="text-gray-600 hover:text-primary transition">About</a>
+                    <a th:href="@{/login}" class="bg-primary text-white px-6 py-2 rounded font-medium hover:bg-primary/90 transition">
+                        Login / Register
+                    </a>
+                </div>
+                <button class="md:hidden text-gray-600">
+                    <i class="ri-menu-line text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12">
+        <h2 class="text-3xl font-bold text-center mb-8">Ticket Queue Status</h2>
+        
+        <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <span th:text="${message}"></span>
+        </div>
+        
+        <!-- Queue Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg border border-gray-100">
+                <h5 class="text-gray-600 text-sm font-medium mb-2">Total Tickets</h5>
+                <h3 class="text-3xl font-bold text-gray-900" th:text="${#lists.size(tickets)}">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-lg border border-gray-100">
+                <h5 class="text-gray-600 text-sm font-medium mb-2">Pending</h5>
+                <h3 class="text-3xl font-bold text-yellow-500" th:text="${#lists.size(tickets.?[status == 'PENDING'])}">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-lg border border-gray-100">
+                <h5 class="text-gray-600 text-sm font-medium mb-2">Confirmed</h5>
+                <h3 class="text-3xl font-bold text-green-500" th:text="${#lists.size(tickets.?[status == 'CONFIRMED'])}">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-lg border border-gray-100">
+                <h5 class="text-gray-600 text-sm font-medium mb-2">Canceled</h5>
+                <h3 class="text-3xl font-bold text-red-500" th:text="${#lists.size(tickets.?[status == 'CANCELED'])}">0</h3>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-4 mb-8">
+            <form th:action="@{/process-next}" method="post">
+                <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded font-medium transition inline-flex items-center">
+                    <i class="ri-play-circle-line mr-2"></i> Process Next Ticket
+                </button>
+            </form>
+            <a th:href="@{/request}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded font-medium transition inline-flex items-center">
+                <i class="ri-add-circle-line mr-2"></i> Add New Ticket
+            </a>
+        </div>
+        
+        <h4 class="text-xl font-semibold mb-6">Queue (FIFO Order)</h4>
+        
+        <div th:if="${#lists.isEmpty(tickets)}" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6">
+            <p class="font-medium">The ticket queue is currently empty.</p>
+        </div>
+        
+        <div th:unless="${#lists.isEmpty(tickets)}" class="space-y-4">
+            <div th:each="ticket, status : ${tickets}" 
+                 th:class="'bg-white rounded-lg border border-gray-100 overflow-hidden transition duration-300 ' + 
+                          (${ticket.class.simpleName == 'VIPTicket'} ? 'border-l-4 border-primary' : '')">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                        <div class="flex items-center space-x-4">
+                            <span class="bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center font-medium" th:text="${status.count}">1</span>
+                            <div>
+                                <h5 class="font-semibold text-gray-900" th:text="${ticket.eventName}">Event Name</h5>
+                                <p class="text-sm text-gray-500" th:text="${ticket.id}">ID</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-medium">Name:</span> <span th:text="${ticket.userName}"></span>
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-medium">Type:</span> 
+                                <span th:class="${ticket.class.simpleName == 'VIPTicket'} ? 'text-primary font-medium' : ''"
+                                      th:text="${ticket.class.simpleName == 'VIPTicket'} ? 'VIP' : 'Regular'"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-medium">Request Time:</span><br>
+                                <span th:text="${ticket.formattedRequestTime}"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <span th:class="'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ' + 
+                                (${ticket.status == 'PENDING'} ? 'bg-yellow-100 text-yellow-800' : 
+                                (${ticket.status == 'CONFIRMED'} ? 'bg-green-100 text-green-800' : 
+                                (${ticket.status == 'CANCELED'} ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')))"
+                                th:text="${ticket.status}">
+                                Status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-50 py-8 border-t border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-600">&copy; 2025 your tickets.lk. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
