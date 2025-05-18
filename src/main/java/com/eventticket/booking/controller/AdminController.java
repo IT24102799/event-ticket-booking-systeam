@@ -69,6 +69,12 @@ public class AdminController {
         return "admin-management";
     }
 
+    @GetMapping("/login-admin")
+    public String adminLoginPage() {
+        System.out.println("Handling /login-admin request");
+        return "login-admin";
+    }
+
     @Autowired
     private AdminService adminService;
 
