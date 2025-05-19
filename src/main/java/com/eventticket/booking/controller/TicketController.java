@@ -11,19 +11,39 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 public class TicketController {
-    
+
     @Autowired
     private TicketService ticketService;
-    
-    // Home page
-    @GetMapping("/")
-    public String home(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        return "index";
+
+    // Tickets home page
+    @GetMapping("/tickets-home")
+    public String ticketsHome(Model model) {
+        model.addAttribute("pageTitle", "Tickets Home");
+
+        // Get all tickets for display
+        List<Ticket> allTickets = ticketService.getAllTickets();
+        model.addAttribute("tickets", allTickets);
+
+        // Count tickets by status
+        long pendingCount = allTickets.stream()
+                .filter(t -> "PENDING".equals(t.getStatus()))
+                .count();
+
+        long processedCount = allTickets.stream()
+                .filter(t -> "PROCESSED".equals(t.getStatus()))
+                .count();
+
+        model.addAttribute("totalCount", allTickets.size());
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("processedCount", processedCount);
+
+        return "tickets-home";
     }
-    
+
     // Show ticket request form
     @GetMapping("/request")
     public String showRequestForm(Model model) {
@@ -32,7 +52,7 @@ public class TicketController {
         model.addAttribute("vipTicket", new VIPTicket());
         return "request-form";
     }
-    
+
     // Process regular ticket request
     @PostMapping("/request/regular")
     public String processRegularTicketRequest(@ModelAttribute RegularTicket ticket,
@@ -46,7 +66,7 @@ public class TicketController {
             return "redirect:/request";
         }
     }
-    
+
     // Process VIP ticket request
     @PostMapping("/request/vip")
     public String processVIPTicketRequest(@ModelAttribute VIPTicket ticket,
@@ -60,7 +80,7 @@ public class TicketController {
             return "redirect:/request";
         }
     }
-    
+
     // Show ticket confirmation page
     @GetMapping("/confirmation")
     public String showConfirmation(@RequestParam String id, Model model, RedirectAttributes redirectAttributes) {
@@ -69,12 +89,12 @@ public class TicketController {
             redirectAttributes.addFlashAttribute("error", "Ticket not found");
             return "redirect:/";
         }
-        
+
         model.addAttribute("pageTitle", "Ticket Confirmation");
         model.addAttribute("ticket", ticket);
         return "confirmation";
     }
-    
+
     // Show ticket queue status
     @GetMapping("/queue")
     public String showQueue(Model model) {
@@ -82,7 +102,7 @@ public class TicketController {
         model.addAttribute("tickets", ticketService.getAllTickets());
         return "queue";
     }
-    
+
     // Show all tickets
     @GetMapping("/tickets")
     public String showAllTickets(Model model) {
@@ -90,14 +110,14 @@ public class TicketController {
         model.addAttribute("tickets", ticketService.getAllTickets());
         return "ticket-list";
     }
-    
+
     // Process next ticket in queue
     @PostMapping("/process-next")
     public String processNextTicket(RedirectAttributes redirectAttributes) {
         try {
             Ticket processed = ticketService.processNextTicket();
             if (processed != null) {
-                redirectAttributes.addFlashAttribute("message", 
+                redirectAttributes.addFlashAttribute("message",
                     "Processed ticket: " + processed.getId() + " for " + processed.getUserName());
             } else {
                 redirectAttributes.addFlashAttribute("message", "No pending tickets in the queue.");
@@ -107,10 +127,10 @@ public class TicketController {
         }
         return "redirect:/queue";
     }
-    
+
     // Update ticket status
     @PostMapping("/update-status")
-    public String updateTicketStatus(@RequestParam String id, 
+    public String updateTicketStatus(@RequestParam String id,
                                    @RequestParam String status,
                                    RedirectAttributes redirectAttributes) {
         try {
@@ -125,7 +145,7 @@ public class TicketController {
         }
         return "redirect:/tickets";
     }
-    
+
     // Delete ticket
     @PostMapping("/delete")
     public String deleteTicket(@RequestParam String id, RedirectAttributes redirectAttributes) {
