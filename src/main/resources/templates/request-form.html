@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Ticket - your tickets.lk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/templates/styles.css}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#F74500',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="bg-white py-4 border-b border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <a th:href="@{/}" class="text-primary text-2xl font-bold">your tickets.lk</a>
+                <div class="hidden md:flex space-x-8">
+                    <a th:href="@{/}" class="text-gray-600 hover:text-primary transition">Home</a>
+                    <a th:href="@{/events}" class="text-gray-600 hover:text-primary transition">Events</a>
+                    <a th:href="@{/about}" class="text-gray-600 hover:text-primary transition">About</a>
+                    <a th:href="@{/login}" class="bg-primary text-white px-6 py-2 rounded font-medium hover:bg-primary/90 transition">
+                        Login / Register
+                    </a>
+                </div>
+                <button class="md:hidden text-gray-600">
+                    <i class="ri-menu-line text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8">Request a Ticket</h2>
+            
+            <!-- Ticket Type Tabs -->
+            <div class="mb-8">
+                <div class="flex justify-center space-x-4" role="tablist">
+                    <button class="px-6 py-2 font-medium rounded bg-primary text-white" id="regular-tab" onclick="switchTab('regular')">
+                        Regular Ticket
+                    </button>
+                    <button class="px-6 py-2 font-medium rounded bg-gray-100 text-gray-700 hover:bg-gray-200" id="vip-tab" onclick="switchTab('vip')">
+                        VIP Ticket
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Regular Ticket Form -->
+            <div id="regular" class="tab-content block">
+                <form th:action="@{/request/regular}" th:object="${regularTicket}" method="post" class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg border border-gray-100">
+                        <div class="mb-6">
+                            <label for="eventName" class="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
+                            <input type="text" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="eventName" th:field="*{eventName}" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="userName" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                                <input type="text" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="userName" th:field="*{userName}" required>
+                            </div>
+                            <div>
+                                <label for="userEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="userEmail" th:field="*{userEmail}" required>
+                            </div>
+                            <div>
+                                <label for="userPhone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <input type="tel" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="userPhone" th:field="*{userPhone}" required>
+                            </div>
+                            <div>
+                                <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Ticket Price</label>
+                                <input type="number" step="0.01" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="price" th:field="*{price}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label for="section" class="block text-sm font-medium text-gray-700 mb-2">Seating Section</label>
+                            <select class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="section" th:field="*{section}">
+                                <option value="General">General</option>
+                                <option value="Front">Front</option>
+                                <option value="Middle">Middle</option>
+                                <option value="Back">Back</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded font-medium transition">
+                        Submit Request
+                    </button>
+                </form>
+            </div>
+            
+            <!-- VIP Ticket Form -->
+            <div id="vip" class="tab-content hidden">
+                <form th:action="@{/request/vip}" th:object="${vipTicket}" method="post" class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg border border-gray-100">
+                        <div class="mb-6">
+                            <label for="vipEventName" class="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
+                            <input type="text" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipEventName" th:field="*{eventName}" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="vipUserName" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                                <input type="text" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipUserName" th:field="*{userName}" required>
+                            </div>
+                            <div>
+                                <label for="vipUserEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipUserEmail" th:field="*{userEmail}" required>
+                            </div>
+                            <div>
+                                <label for="vipUserPhone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <input type="tel" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipUserPhone" th:field="*{userPhone}" required>
+                            </div>
+                            <div>
+                                <label for="vipPrice" class="block text-sm font-medium text-gray-700 mb-2">Ticket Price</label>
+                                <input type="number" step="0.01" class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipPrice" th:field="*{price}" value="150.00" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label for="vipBenefits" class="block text-sm font-medium text-gray-700 mb-2">VIP Benefits</label>
+                            <textarea class="contact-input w-full px-4 py-2 border border-gray-300 rounded-md" id="vipBenefits" th:field="*{vipBenefits}" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded font-medium transition">
+                        Submit VIP Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-50 py-8 border-t border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-gray-600">&copy; 2025 your tickets.lk. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab buttons
+            if (tabId === 'regular') {
+                document.getElementById('regular-tab').classList.remove('bg-gray-100', 'text-gray-700');
+                document.getElementById('regular-tab').classList.add('bg-primary', 'text-white');
+                document.getElementById('vip-tab').classList.remove('bg-primary', 'text-white');
+                document.getElementById('vip-tab').classList.add('bg-gray-100', 'text-gray-700');
+            } else {
+                document.getElementById('vip-tab').classList.remove('bg-gray-100', 'text-gray-700');
+                document.getElementById('vip-tab').classList.add('bg-primary', 'text-white');
+                document.getElementById('regular-tab').classList.remove('bg-primary', 'text-white');
+                document.getElementById('regular-tab').classList.add('bg-gray-100', 'text-gray-700');
+            }
+        }
+    </script>
+</body>
+</html> 
