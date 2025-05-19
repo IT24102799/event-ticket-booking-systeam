@@ -40,13 +40,17 @@
                class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
                 <i class="ri-calendar-line inline mr-2"></i> Events
             </a>
+            <a th:href="@{/admin/payments}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-money-dollar-circle-line inline mr-2"></i> Payment Details
+            </a>
             <a th:href="@{/admin/users}"
                class="block py-2.5 px-4 rounded bg-primary text-white transition duration-200">
                 <i class="ri-user-line inline mr-2"></i> Users
             </a>
             <a href="#"
                class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
-                <i class="ri-settings-3-line inline mr-2"></i> Tickets
+                <i class="ri-ticket-line inline mr-2"></i> Tickets
             </a>
             <!-- Logout button -->
             <a th:href="@{/logout}"

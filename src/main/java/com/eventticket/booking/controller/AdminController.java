@@ -73,4 +73,11 @@ public class AdminController {
         }
         return "redirect:/admin/users";
     }
+
+    @GetMapping("/admin/payments")
+    public String managePayments(Model model) {
+        // We don't need to add any attributes to the model
+        // as the payments will be fetched via AJAX
+        return "payment-admin";
+    }
 }
