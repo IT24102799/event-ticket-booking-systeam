@@ -1,8 +1,11 @@
 package com.eventticket.booking.service;
 
+import com.eventticket.booking.model.Admin;
 import com.eventticket.booking.model.Event;
 import com.eventticket.booking.model.TicketType;
 import com.eventticket.booking.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -11,6 +14,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,10 +31,17 @@ public class FileStorageService {
     private final String USER_COUNTER_FILE = "user_counter.txt";
     private final String TICKET_TYPES_FILE = "ticket_types.txt";
     private final String TICKET_TYPE_COUNTER_FILE = "ticket_type_counter.txt";
+    private final String ADMINS_FILE = "admins.txt";
+
+    private final ObjectMapper objectMapper;
 
     public FileStorageService() {
         // Create data directory if it doesn't exist
         createDataDirectory();
+
+        // Initialize ObjectMapper
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void createDataDirectory() {
@@ -64,10 +76,7 @@ public class FileStorageService {
             if (jsonContent.startsWith("[") && jsonContent.endsWith("]")) {
                 // Parse JSON array
                 try {
-                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-
-                    Event[] events = mapper.readValue(jsonContent, Event[].class);
+                    Event[] events = objectMapper.readValue(jsonContent, Event[].class);
                     for (Event event : events) {
                         eventMap.put(event.getId(), event);
                     }
@@ -117,9 +126,7 @@ public class FileStorageService {
             System.out.println("Events to save: " + events.size());
 
             // Save as JSON
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, events.values());
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, events.values());
             System.out.println("Events saved successfully in JSON format");
         } catch (IOException e) {
             System.err.println("Error saving events: " + e.getMessage());
@@ -376,6 +383,37 @@ public class FileStorageService {
             }
         } catch (IOException e) {
             System.err.println("Error saving ticket type counter: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public List<Admin> readAdmins() {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            if (!file.exists()) {
+                return new ArrayList<>();
+            }
+
+            Admin[] admins = objectMapper.readValue(file, Admin[].class);
+            List<Admin> adminList = new ArrayList<>();
+            for (Admin admin : admins) {
+                adminList.add(admin);
+            }
+            return adminList;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+
+    public void writeAdmins(List<Admin> admins) {
+
+        try {
+            File file = new File(DATA_DIR + File.separator + ADMINS_FILE);
+            objectMapper.writeValue(file, admins);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

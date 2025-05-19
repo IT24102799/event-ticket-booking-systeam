@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Your Tickets.lk</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#F74500', secondary: '#1F2937' },
+                borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+            }
+        }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body { background-color: #f9fafb; }
+    .custom-checkbox { display: inline-block; position: relative; padding-left: 30px; cursor: pointer; }
+    .custom-checkbox input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #fff; border: 1px solid #d1d5db; border-radius: 4px; }
+    .custom-checkbox:hover input~.checkmark { background-color: #f3f4f6; }
+    .custom-checkbox input:checked~.checkmark { background-color: #F74500; border-color: #F74500; }
+    .checkmark:after { content: ""; position: absolute; display: none; }
+    .custom-checkbox input:checked~.checkmark:after { display: block; }
+  </style>
+</head>
+<body>
+<!-- Main Content Only -->
+<main class="flex items-center justify-center py-12 px-4">
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden max-w-md w-full">
+    <!-- Login Form -->
+    <div id="login-form" class="p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
+      <form id="login-form-element">
+        <div class="mb-4">
+          <label for="login-username" class="block text-gray-700 font-medium mb-2">Username</label>
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <i class="ri-user-line"></i>
+            </div>
+            <input type="text" id="login-username" class="form-input w-full px-10 py-3 border border-gray-300 rounded text-sm" placeholder="Enter your username" required>
+          </div>
+          <p id="login-username-error" class="text-red-500 text-xs mt-1 hidden">Please enter your username</p>
+        </div>
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <label for="login-password" class="block text-gray-700 font-medium">Password</label>
+            <a href="#" class="text-sm text-primary hover:text-primary/80">Forgot password?</a>
+          </div>
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <i class="ri-lock-line"></i>
+            </div>
+            <input type="password" id="login-password" class="form-input w-full px-10 py-3 border border-gray-300 rounded text-sm" placeholder="Enter your password" required>
+            <div class="password-toggle">
+              <i class="ri-eye-off-line" id="login-password-toggle"></i>
+            </div>
+          </div>
+          <p id="login-password-error" class="text-red-500 text-xs mt-1 hidden">Please enter your password</p>
+        </div>
+        <div class="mb-6">
+          <label class="custom-checkbox">
+            <span class="text-gray-700 text-sm">Remember me</span>
+            <input type="checkbox" id="remember-me">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <button href="dashboard.html" type="submit" class="w-full bg-primary text-white py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors font-medium">Login</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('login-form-element');
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        // Simple validation
+        if (!username) {
+          document.getElementById('login-username-error').classList.remove('hidden');
+          return;
+        }
+
+        if (!password) {
+          document.getElementById('login-password-error').classList.remove('hidden');
+          return;
+        }
+
+        // Check for admin credentials
+        if ((username === 'admin' && password === 'admin123') ||
+            (username === 'damindu' && password === 'damindu')) {
+          // Redirect to admin dashboard
+          window.location.href = '/admin/dashboard';
+        } else {
+          alert('Invalid credentials. Please try again.');
+        }
+      });
+    }
+
+    // Toggle password visibility
+    const passwordToggle = document.getElementById('login-password-toggle');
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', function() {
+        const passwordInput = document.getElementById('login-password');
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.classList.remove('ri-eye-off-line');
+          this.classList.add('ri-eye-line');
+        } else {
+          passwordInput.type = 'password';
+          this.classList.remove('ri-eye-line');
+          this.classList.add('ri-eye-off-line');
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
