@@ -1,0 +1,124 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== '' && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter(row => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex((row, index) =>
+                row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews - Your Tickets.lk</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#F74500', secondary: '#1F2937' },
+          borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body class="bg-gray-100 font-inter">
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md">
+    <div class="p-6">
+      <h1 class="text-2xl font-bold text-primary">Admin Panel</h1>
+    </div>
+    <nav class="mt-10">
+      <a href="dashboard-admin.html" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-dashboard-line inline mr-2"></i> Dashboard
+      </a>
+      <a href="event-admin.html" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-calendar-line inline mr-2"></i> Events
+      </a>
+      <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-user-line inline mr-2"></i> Users
+      </a>
+      <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-settings-3-line inline mr-2"></i> Tickets
+      </a>
+      <a href="reviews-admin.html" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-star-line inline mr-2"></i> Reviews
+      </a>
+      <a href="../static/index.html" class="block py-2.5 px-4 mt-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+        <i class="ri-logout-box-line inline mr-2"></i> Logout
+      </a>
+    </nav>
+  </aside>
+  <!-- Main Content -->
+  <main class="flex-1 p-10">
+    <header class="mb-8">
+      <h2 class="text-3xl font-bold text-secondary">Reviews</h2>
+    </header>
+    <section>
+      <!-- Event Reviews Section -->
+      <div class="mt-8 p-6 bg-white rounded shadow">
+        <h3 class="text-xl font-semibold mb-4">Event Reviews</h3>
+        <div id="event-reviews-container" class="space-y-4">
+          <!-- Event reviews will be populated by JavaScript -->
+        </div>
+      </div>
+      <!-- Platform Reviews Section -->
+      <div class="mt-8 p-6 bg-white rounded shadow">
+        <h3 class="text-xl font-semibold mb-4">Platform Reviews</h3>
+        <div id="platform-reviews-container" class="space-y-4">
+          <!-- Platform reviews will be populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  // This script is now replaced by the external reviews-admin.js file
+  // which handles fetching and displaying reviews from the API
+</script>
+//add sock.js and STOMP.js
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="../js/reviews-admin.js"></script>
+</body>
+</html>
