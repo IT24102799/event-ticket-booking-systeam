@@ -1,132 +1,127 @@
 package com.eventticket.booking.service;
 
-
 import com.eventticket.booking.model.Ticket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+
 import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
-    private static final String TICKETS_FILE = "tickets.txt";
+    private Map<String, Ticket> tickets = new ConcurrentHashMap<>();
+    private AtomicInteger ticketCounter = new AtomicInteger(1);
+    private final ReentrantLock ticketLock = new ReentrantLock();
     
-    // Create a new ticket and save it to the file
-    public Ticket createTicket(Ticket ticket) {
-        // Ensure the file exists
-        createFileIfNotExists();
-        
-        // Write the ticket to the file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TICKETS_FILE, true))) {
-            writer.write(ticket.toString());
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to save ticket", e);
-        }
-        
-        return ticket;
+    @Autowired
+    private EventService eventService;
+    
+    @Autowired
+    private TicketTypeService ticketTypeService;
+    
+    public List<Ticket> getAllTickets() {
+        return new ArrayList<>(tickets.values());
     }
     
-    // Get all tickets in FIFO order (implementing Queue concept)
-    public List<Ticket> getAllTickets() {
-        createFileIfNotExists();
+    public List<Ticket> getTicketsByUserId(Long userId) {
+        return tickets.values().stream()
+                .filter(ticket -> ticket.getUserId().equals(userId))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Ticket> getTicketsByEventId(Long eventId) {
+        return tickets.values().stream()
+                .filter(ticket -> ticket.getEventId().equals(eventId))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Ticket> getTicketsByPaymentId(String paymentId) {
+        return tickets.values().stream()
+                .filter(ticket -> paymentId.equals(ticket.getPaymentId()))
+                .collect(Collectors.toList());
+    }
+    
+    public Optional<Ticket> getTicketById(String id) {
+        return Optional.ofNullable(tickets.get(id));
+    }
+    
+    public Ticket createTicket(Ticket ticket) {
+        ticketLock.lock();
+        try {
+            String ticketId = "TKT-" + String.format("%06d", ticketCounter.getAndIncrement());
+            ticket.setId(ticketId);
+            
+            // Calculate total price if not set
+            if (ticket.getTotalPrice() == null && ticket.getUnitPrice() != null) {
+                ticket.setTotalPrice(ticket.getUnitPrice().multiply(BigDecimal.valueOf(ticket.getQuantity())));
+            }
+            
+            // Set purchase date if not set
+            if (ticket.getPurchaseDate() == null) {
+                ticket.setPurchaseDate(LocalDateTime.now());
+            }
+            
+            tickets.put(ticketId, ticket);
+            return ticket;
+        } finally {
+            ticketLock.unlock();
+        }
+    }
+    
+    public Ticket updateTicket(String id, Ticket ticketDetails) {
+        ticketLock.lock();
+        try {
+            Ticket existingTicket = tickets.get(id);
+            if (existingTicket != null) {
+                // Update fields but preserve ID
+                ticketDetails.setId(id);
+                tickets.put(id, ticketDetails);
+                return ticketDetails;
+            }
+            return null;
+        } finally {
+            ticketLock.unlock();
+        }
+    }
+    
+    public boolean deleteTicket(String id) {
+        ticketLock.lock();
+        try {
+            return tickets.remove(id) != null;
+        } finally {
+            ticketLock.unlock();
+        }
+    }
+    
+    public List<Ticket> createTicketsFromPayment(Map<String, Object> paymentDetails, String paymentId) {
+        List<Ticket> createdTickets = new ArrayList<>();
         
         try {
-            return Files.lines(Paths.get(TICKETS_FILE))
-                    .map(Ticket::fromString)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-    
-    // Get a specific ticket by ID
-    public Ticket getTicketById(String id) {
-        return getAllTickets().stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-    
-    // Update a ticket's status
-    public boolean updateTicketStatus(String id, String status) {
-        List<Ticket> tickets = getAllTickets();
-        boolean updated = false;
-        
-        for (Ticket ticket : tickets) {
-            if (ticket.getId().equals(id)) {
-                ticket.setStatus(status);
-                updated = true;
-                break;
-            }
+            Long eventId = Long.valueOf(paymentDetails.get("eventId").toString());
+            String eventName = paymentDetails.get("eventName").toString();
+            Long userId = Long.valueOf(paymentDetails.get("userId").toString());
+            String userName = paymentDetails.getOrDefault("userName", "Guest").toString();
+            int ticketCount = Integer.parseInt(paymentDetails.get("ticketCount").toString());
+            BigDecimal unitPrice = new BigDecimal(paymentDetails.get("unitPrice").toString());
+            String ticketTypeName = paymentDetails.getOrDefault("ticketTypeName", "General Admission").toString();
+            
+            Ticket ticket = new Ticket(eventId, eventName, userId, userName, 
+                                      ticketTypeName, ticketCount, unitPrice, paymentId);
+            
+            createdTickets.add(createTicket(ticket));
+            
+        } catch (Exception e) {
+            // Log error
+            System.err.println("Error creating tickets from payment: " + e.getMessage());
         }
         
-        if (updated) {
-            saveAllTickets(tickets);
-        }
-        
-        return updated;
-    }
-    
-    // Delete a ticket
-    public boolean deleteTicket(String id) {
-        List<Ticket> tickets = getAllTickets();
-        boolean removed = tickets.removeIf(t -> t.getId().equals(id));
-        
-        if (removed) {
-            saveAllTickets(tickets);
-        }
-        
-        return removed;
-    }
-    
-    // Process the next ticket in the queue (FIFO)
-    public Ticket processNextTicket() {
-        List<Ticket> tickets = getAllTickets();
-        
-        // Find the first pending ticket
-        Optional<Ticket> nextTicket = tickets.stream()
-                .filter(t -> "PENDING".equals(t.getStatus()))
-                .findFirst();
-        
-        if (nextTicket.isPresent()) {
-            Ticket ticket = nextTicket.get();
-            ticket.process(); // Polymorphic call
-            saveAllTickets(tickets);
-            return ticket;
-        }
-        
-        return null;
-    }
-    
-    // Helper method to save all tickets back to the file
-    private void saveAllTickets(List<Ticket> tickets) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TICKETS_FILE))) {
-            for (Ticket ticket : tickets) {
-                writer.write(ticket.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to update tickets file", e);
-        }
-    }
-    
-    // Helper method to create the file if it doesn't exist
-    private void createFileIfNotExists() {
-        File file = new File(TICKETS_FILE);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failed to create tickets file", e);
-            }
-        }
+        return createdTickets;
+
     }
 }

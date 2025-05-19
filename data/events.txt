@@ -1,1 +1,53 @@
-[{"id":3,"name":"CAMELLIA","description":"\"CAMELLIA\" an electrifying musical concert which is set to take place on the 23rd of May 2025 at The Viharamahadevi Open Air Theatre. This event will bring together some of the most talented and trending artists in Sri Lanka, creating an unforgettable experience for music lovers.\r\nThe concert will feature an all-star lineup:\r\nRidma | Yasas | Suneera | Mihiran | Damsara | Dilu Beats | Dhyan | Gangadara","startDateTime":"2025-05-23T20:28:00","endDateTime":"2025-05-23T12:00:00","venue":"The Viharamahadevi Open Air Theatre","price":2500,"availableTickets":100,"imageUrl":"https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2FIPi3Xh8qHAgkNWtzEDYbBsOmsH08Z8dVmpnLvigU.jpg&w=750&q=75"},{"id":4,"name":"THE BAILA PARTY","description":"The Baila Party\" Organized By Skyline Global On The 28th of June 2025 From 7:30PM Onwards At The Waters Edge.\r\nGet ready to experience the ultimate Baila Party - where the beats are hotter, the nights are longer, and the memories last forever..!! From chart-topping hits to unstoppable baila beats, we're bringing you a night where every second pulses with life!\r\nLegends of sound: Bathiya & Santhush | Rookantha Gunathilake | Nalin Perera | Hector Dias alongside the iconic bands Daddy and Doctor are ready to set the stage on fire..!!","startDateTime":"2025-05-28T20:00:00","endDateTime":"2025-05-28T12:34:00","venue":"Water's Edge","price":5000,"availableTickets":100,"imageUrl":"https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F202504271027-the-baila-party-thumbnail.jpg&w=750&q=75"},{"id":5,"name":"MIRISSA SENSATION","description":"Get Ready for an Unforgettable Night at Surf Bar Mirissa – SENSATION 2025\r\nJoin us on May 20th at the iconic Surf Bar Mirissa for SENSATION 2025 – an electrifying beach party experience like no other! Dance the night away from 1 PM till 1 AM with an explosive lineup of the island's hottest DJs, dropping the best in electronic and house beats. Featuring a Star-Studded DJ Lineup (A–Z):  • Alpha 21  • Ancient Soul  • Enzovood  • Professor B2B Anush  • Iman Carder  • JP Meyer  • Noisey Project  • Poola B2B Avishka  • Yomal Expect insane energy, vibrant visuals, beachside vibes, and an ocean-themed setup with epic performances and sound. This is more than just a party – it's a full-blown MIRISSA SENSATION 2025! Tickets:  • Phase 1: LKR 5,000  • At the Gate: LKR 6,000\r\nLocation: Surf Bar, Mirissa\r\nMore Info: Call: 077 664 89 27 / 076 573 89 33","startDateTime":"2025-05-20T17:00:00","endDateTime":"2025-05-20T12:00:00","venue":"Surf Bar Mirissa","price":5000,"availableTickets":100,"imageUrl":"https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F8crfX5gCjSuluN7TOrc6tJGInCvrmu48Q0pxSqHk.jpg&w=750&q=75"},{"id":6,"name":"GLOW IN THE DARK MARIANS WITH UMARIA AND FALAN","description":"This is a Family Musical Night in view as a fundraising project for the Church development fund of Holy Mother of Expectation Church, Eldeniya, Kadawatha ","startDateTime":"2025-06-17T18:00:00","endDateTime":"2025-06-17T12:00:00","venue":"Wave n' Lake Navy Banquet Hall","price":4000,"availableTickets":100,"imageUrl":"https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F202503081628-glow-in-the-dark-marians-with-umaria-and-falan-thumbnail.jpg&w=750&q=75"}]
+[ {
+  "id" : 3,
+  "name" : "CAMELLIA",
+  "description" : "\"CAMELLIA\" an electrifying musical concert which is set to take place on the 23rd of May 2025 at The Viharamahadevi Open Air Theatre. This event will bring together some of the most talented and trending artists in Sri Lanka, creating an unforgettable experience for music lovers.\r\nThe concert will feature an all-star lineup:\r\nRidma | Yasas | Suneera | Mihiran | Damsara | Dilu Beats | Dhyan | Gangadara",
+  "startDateTime" : [ 2025, 5, 23, 20, 28 ],
+  "endDateTime" : [ 2025, 5, 23, 12, 0 ],
+  "venue" : "The Viharamahadevi Open Air Theatre",
+  "price" : 2500,
+  "availableTickets" : 100,
+  "imageUrl" : "https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2FIPi3Xh8qHAgkNWtzEDYbBsOmsH08Z8dVmpnLvigU.jpg&w=750&q=75",
+  "ticketTypes" : [ ],
+  "hasMultipleTicketTypes" : false,
+  "totalAvailableTickets" : 100
+}, {
+  "id" : 4,
+  "name" : "MUMBAI TO MADRAS BOLLYWOOD",
+  "description" : "Get ready for a night of Bollywood & Tamil beats at iBEACH! Join the party in Colombo on 23.05. Tickets available now!\r\nThe image is a vibrant event poster for \"iBEACH,\" featuring a beach-themed party with locations highlighted in Colombo, Mumbai, and Madras. The event emphasizes Bollywood and Tamil music\r\nDate : Friday, 23.05.2026\r\nContact details : +94 (77) 0087099\r\nTicket Platform : Ticket Ministry\r\nlocation : No. 39, 6 Initium Rd, Dehiwala-Mount Lavinia, Sri Lanka.",
+  "startDateTime" : [ 2025, 5, 23, 21, 0 ],
+  "endDateTime" : [ 2025, 5, 23, 12, 0 ],
+  "venue" : "IBeach Mount Lavinia",
+  "price" : 1500,
+  "availableTickets" : 100,
+  "imageUrl" : "https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F202505191648-mumbai-to-madras-bollywood-thumbnail.jpg&w=750&q=75",
+  "ticketTypes" : [ ],
+  "hasMultipleTicketTypes" : false,
+  "totalAvailableTickets" : 100
+}, {
+  "id" : 5,
+  "name" : "MIRISSA SENSATION",
+  "description" : "Get Ready for an Unforgettable Night at Surf Bar Mirissa – SENSATION 2025\r\nJoin us on May 20th at the iconic Surf Bar Mirissa for SENSATION 2025 – an electrifying beach party experience like no other! Dance the night away from 1 PM till 1 AM with an explosive lineup of the island's hottest DJs, dropping the best in electronic and house beats. Featuring a Star-Studded DJ Lineup (A–Z):  • Alpha 21  • Ancient Soul  • Enzovood  • Professor B2B Anush  • Iman Carder  • JP Meyer  • Noisey Project  • Poola B2B Avishka  • Yomal Expect insane energy, vibrant visuals, beachside vibes, and an ocean-themed setup with epic performances and sound. This is more than just a party – it's a full-blown MIRISSA SENSATION 2025! Tickets:  • Phase 1: LKR 5,000  • At the Gate: LKR 6,000\r\nLocation: Surf Bar, Mirissa\r\nMore Info: Call: 077 664 89 27 / 076 573 89 33",
+  "startDateTime" : [ 2025, 5, 20, 17, 0 ],
+  "endDateTime" : [ 2025, 5, 20, 12, 0 ],
+  "venue" : "Surf Bar Mirissa",
+  "price" : 5000,
+  "availableTickets" : 100,
+  "imageUrl" : "https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F8crfX5gCjSuluN7TOrc6tJGInCvrmu48Q0pxSqHk.jpg&w=750&q=75",
+  "ticketTypes" : [ ],
+  "hasMultipleTicketTypes" : false,
+  "totalAvailableTickets" : 100
+}, {
+  "id" : 6,
+  "name" : "GLOW IN THE DARK MARIANS WITH UMARIA AND FALAN",
+  "description" : "This is a Family Musical Night in view as a fundraising project for the Church development fund of Holy Mother of Expectation Church, Eldeniya, Kadawatha ",
+  "startDateTime" : [ 2025, 6, 17, 18, 0 ],
+  "endDateTime" : [ 2025, 6, 17, 12, 0 ],
+  "venue" : "Wave n' Lake Navy Banquet Hall",
+  "price" : 4000,
+  "availableTickets" : 100,
+  "imageUrl" : "https://www.ticketsministry.com/_next/image?url=https%3A%2F%2Fticketsministry.s3.ap-south-1.amazonaws.com%2Fpublic%2Fevents%2F202503081628-glow-in-the-dark-marians-with-umaria-and-falan-thumbnail.jpg&w=750&q=75",
+  "ticketTypes" : [ ],
+  "hasMultipleTicketTypes" : false,
+  "totalAvailableTickets" : 100
+} ]

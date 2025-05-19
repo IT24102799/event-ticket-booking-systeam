@@ -122,4 +122,11 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin not found");
 
     }
+
+    @GetMapping("/admin/payments")
+    public String managePayments(Model model) {
+        // We don't need to add any attributes to the model
+        // as the payments will be fetched via AJAX
+        return "payment-admin";
+    }
 }

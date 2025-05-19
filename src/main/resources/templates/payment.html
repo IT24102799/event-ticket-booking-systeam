@@ -1,0 +1,303 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+    }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                },
+                fontFamily: {
+                    'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    'inter': ['Inter', 'sans-serif'],
+                    'pacifico': ['Pacifico', 'cursive']
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+<!-- Header -->
+<header class="bg-white shadow">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold text-primary">Your Tickets.lk</a>
+        <div class="hidden md:flex space-x-6 items-center">
+            <a href="/" class="text-gray-600 hover:text-primary">Home</a>
+            <a href="/events" class="text-gray-600 hover:text-primary">Events</a>
+            <a href="/user" class="auth-link text-gray-600 hover:text-primary">Login / Register</a>
+            <div class="user-profile-menu hidden">
+                <a href="/user-profile" id="header-username" class="text-gray-600 hover:text-primary">User</a>
+                <a href="#" id="header-logout" class="text-gray-600 hover:text-primary ml-4">Logout</a>
+            </div>
+        </div>
+        <button class="md:hidden focus:outline-none" id="menu-toggle">
+            <i class="ri-menu-line text-2xl text-gray-600"></i>
+        </button>
+    </nav>
+    <!-- Mobile Menu -->
+    <div class="md:hidden hidden" id="mobile-menu">
+        <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
+            <a href="/" class="text-gray-600 hover:text-primary">Home</a>
+            <a href="/events" class="text-gray-600 hover:text-primary">Events</a>
+            <a href="/user" class="auth-link text-gray-600 hover:text-primary">Login / Register</a>
+            <div class="mobile-user-menu hidden">
+                <a href="/user-profile" id="mobile-username" class="text-gray-600 hover:text-primary">User</a>
+                <a href="#" id="mobile-logout" class="text-gray-600 hover:text-primary">Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Payment Section -->
+<section class="container mx-auto px-6 py-12">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-bold text-primary mb-6">Payment Details</h2>
+
+        <!-- Order Summary -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-gray-700 mb-4">Order Summary</h3>
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-gray-700"><strong>Event:</strong> <span id="event-name">Summer Rock Festival</span></p>
+                <p class="text-gray-700"><strong>Date:</strong> <span id="event-date">May 15, 2025, 8:00 PM</span></p>
+                <p class="text-gray-700"><strong>Venue:</strong> <span id="event-venue">Colombo Exhibition Center</span></p>
+                <p class="text-gray-700"><strong>Tickets:</strong> <span id="ticket-count">2</span> x General Admission</p>
+                <p class="text-gray-700"><strong>Total:</strong> $<span id="total-amount">50.00</span></p>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <form id="payment-form" class="space-y-6">
+            <div>
+                <h3 class="text-lg font-bold text-gray-700 mb-4">Payment Method</h3>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="payment-method" value="credit-card" checked class="mr-2">
+                        <span>Credit Card</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="payment-method" value="paypal" class="mr-2">
+                        <span>PayPal</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="credit-card-form">
+                <div class="mb-4">
+                    <label for="card-name" class="block text-gray-700 mb-2">Name on Card</label>
+                    <input type="text" id="card-name" class="w-full border rounded p-2" placeholder="John Doe">
+                    <p id="card-name-error" class="text-red-500 text-sm mt-1 hidden">Please enter the name on your card.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="card-number" class="block text-gray-700 mb-2">Card Number</label>
+                    <input type="text" id="card-number" class="w-full border rounded p-2" placeholder="1234 5678 9012 3456">
+                    <p id="card-number-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid card number.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="card-expiry" class="block text-gray-700 mb-2">Expiry Date</label>
+                        <input type="text" id="card-expiry" class="w-full border rounded p-2" placeholder="MM/YY">
+                        <p id="card-expiry-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid expiry date.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="card-cvc" class="block text-gray-700 mb-2">CVC</label>
+                        <input type="text" id="card-cvc" class="w-full border rounded p-2" placeholder="123">
+                        <p id="card-cvc-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid CVC.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-opacity-90 transition-colors">
+                Complete Payment
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-12">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-lg font-bold mb-4 font-pacifico">Your Tickets.lk</h3>
+                <p class="text-gray-400">Your one-stop platform for booking event tickets across Sri Lanka.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
+                    <li><a href="/events" class="text-gray-400 hover:text-white">Events</a></li>
+                    <li><a href="/user" class="text-gray-400 hover:text-white">Login</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Contact Us</h3>
+                <p class="text-gray-400">Email: support@yourtickets.lk</p>
+                <p class="text-gray-400">Phone: +94 11 234 5678</p>
+            </div>
+        </div>
+        <div class="mt-8 border-t border-gray-700 pt-6 text-center">
+            <p class="text-gray-400">&copy; 2025 Your Tickets.lk. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Check authentication and update auth links
+    document.addEventListener('DOMContentLoaded', () => {
+        // Parse URL parameters for order summary
+        const params = new URLSearchParams(window.location.search);
+        const eventId = params.get('eventId') || '1';
+        const eventName = params.get('eventName') || 'Event';
+        const date = params.get('date') || 'Date not specified';
+        const venue = params.get('venue') || 'Venue not specified';
+        const ticketCount = params.get('ticketCount') || '1';
+        const total = params.get('total') || '0.00';
+        const ticketTypeId = params.get('ticketTypeId') || '';
+        const ticketTypeName = params.get('ticketTypeName') || 'General Admission';
+
+        // Update order summary
+        document.getElementById('event-name').textContent = eventName;
+        document.getElementById('event-date').textContent = date;
+        document.getElementById('event-venue').textContent = venue;
+        document.getElementById('ticket-count').textContent = ticketCount;
+        document.getElementById('total-amount').textContent = total;
+
+        // Payment form submission
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cardNumber = document.getElementById('card-number').value;
+            const cardExpiry = document.getElementById('card-expiry').value;
+            const cardCvc = document.getElementById('card-cvc').value;
+            const cardName = document.getElementById('card-name').value;
+
+            // Reset error messages
+            document.getElementById('card-number-error').classList.add('hidden');
+            document.getElementById('card-expiry-error').classList.add('hidden');
+            document.getElementById('card-cvc-error').classList.add('hidden');
+            document.getElementById('card-name-error').classList.add('hidden');
+
+            let isValid = true;
+            
+            // Simple validation
+            if (!cardNumber || cardNumber.length < 16) {
+                document.getElementById('card-number-error').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!cardExpiry || !cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+                document.getElementById('card-expiry-error').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!cardCvc || cardCvc.length < 3) {
+                document.getElementById('card-cvc-error').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!cardName) {
+                document.getElementById('card-name-error').classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Get current user info
+                const userId = 1; // Replace with actual user ID from authentication
+                const userName = cardName; // Use card name as fallback
+                
+                // Prepare payment details
+                const orderDetails = {
+                    eventId: eventId,
+                    eventName: eventName,
+                    date: date,
+                    venue: venue,
+                    ticketCount: parseInt(ticketCount),
+                    total: parseFloat(total),
+                    unitPrice: parseFloat(total) / parseInt(ticketCount),
+                    paymentMethod: document.querySelector('input[name="payment-method"]:checked').value,
+                    cardName: cardName,
+                    userId: userId,
+                    userName: userName,
+                    ticketTypeName: ticketTypeName,
+                    ticketTypeId: ticketTypeId
+                };
+
+                // Send to backend API
+                fetch('/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderDetails)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.id) {
+                        alert('Payment processed successfully! Your tickets will be sent to your email.');
+                        window.location.href = '/events';
+                    } else {
+                        alert('Payment failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Payment error:', error);
+                    alert('An error occurred. Please try again later.');
+                });
+            }
+        });
+    });
+
+    // Mobile menu toggle
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>
