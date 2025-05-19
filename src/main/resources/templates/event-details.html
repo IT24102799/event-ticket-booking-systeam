@@ -98,9 +98,24 @@
                                     <span class="text-gray-600 mr-2">Price:</span>
                                     <span class="text-2xl font-bold text-primary" th:text="'$' + ${event.price}">$0.00</span>
                                 </div>
-                                <div class="flex items-center">
+                                <div class="flex items-center mb-4">
                                     <span class="text-gray-600 mr-2">Available Tickets:</span>
                                     <span class="font-semibold" th:text="${event.availableTickets}">0</span>
+                                </div>
+                                
+                                <!-- Ticket quantity selector -->
+                                <div class="flex items-center mb-4">
+                                    <span class="text-gray-600 mr-2">Quantity:</span>
+                                    <div class="flex items-center">
+                                        <button class="decrease bg-gray-200 px-3 py-1 rounded-l-md">-</button>
+                                        <input type="number" id="ticketQuantity" min="1" max="10" value="1" class="w-16 text-center border-y border-gray-300 py-1">
+                                        <button class="increase bg-gray-200 px-3 py-1 rounded-r-md">+</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-2">
+                                    <span class="text-gray-600 mr-2">Total:</span>
+                                    <span id="totalPrice" class="text-xl font-bold text-primary" th:text="'$' + ${event.price}">$0.00</span>
                                 </div>
                             </div>
 
@@ -118,7 +133,7 @@
                                         <span class="text-sm text-gray-600">
                                             <span th:text="${ticketType.availableQuantity}">0</span> tickets available
                                         </span>
-                                        <button class="bg-primary text-white px-4 py-1 rounded-md text-sm hover:bg-opacity-90 transition-colors">
+                                        <button class="bg-primary text-white px-4 py-1 rounded-md text-sm hover:bg-opacity-90 transition-colors select-ticket-type" th:data-ticket-type-id="${ticketType.id}" th:data-ticket-type-name="${ticketType.name}" th:data-ticket-type-price="${ticketType.price}">
                                             Select
                                         </button>
                                     </div>
@@ -130,7 +145,8 @@
                             <a th:href="@{/events}" class="inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors mr-2">
                                 <i class="ri-arrow-left-line mr-1"></i> Back to Events
                             </a>
-                            <a href="#" class="inline-block px-6 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-colors">
+                            <a id="bookTicketsBtn" th:href="@{/payment(eventId=${event.id},eventName=${event.name},date=${#temporals.format(event.startDateTime, 'MMM dd, yyyy h:mm a')},venue=${event.venue},ticketCount=1,total=${event.price})}" 
+                               class="inline-block px-6 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-colors">
                                 Book Tickets
                             </a>
                         </div>
@@ -147,23 +163,95 @@
         document.addEventListener('DOMContentLoaded', function() {
             const ticketQuantityInput = document.getElementById('ticketQuantity');
             const totalPriceElement = document.getElementById('totalPrice');
-            const pricePerTicket = parseFloat(totalPriceElement.textContent.replace('$', ''));
-            const decreaseButton = document.querySelector('button.decrease');
-            const increaseButton = document.querySelector('button.increase');
+            const bookTicketsBtn = document.getElementById('bookTicketsBtn');
+            
+            if(ticketQuantityInput && totalPriceElement && bookTicketsBtn) {
+                const pricePerTicket = parseFloat(totalPriceElement.textContent.replace('$', ''));
+                const decreaseButton = document.querySelector('button.decrease');
+                const increaseButton = document.querySelector('button.increase');
+                
+                // Update booking URL with quantity and total
+                function updateBookingUrl() {
+                    const quantity = parseInt(ticketQuantityInput.value);
+                    const total = (pricePerTicket * quantity).toFixed(2);
+                    
+                    // Get current URL
+                    let url = new URL(bookTicketsBtn.href);
+                    let params = new URLSearchParams(url.search);
+                    
+                    // Update parameters
+                    params.set('ticketCount', quantity);
+                    params.set('total', total);
+                    
+                    // Set new URL
+                    url.search = params.toString();
+                    bookTicketsBtn.href = url.toString();
+                }
 
-            if(decreaseButton && increaseButton && ticketQuantityInput && totalPriceElement) {
-                decreaseButton.addEventListener('click', function() {
-                    let current = parseInt(ticketQuantityInput.value);
-                    if(current > 1) {
-                        ticketQuantityInput.value = --current;
+                if(decreaseButton && increaseButton) {
+                    decreaseButton.addEventListener('click', function() {
+                        let current = parseInt(ticketQuantityInput.value);
+                        if(current > 1) {
+                            ticketQuantityInput.value = --current;
+                            totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
+                            updateBookingUrl();
+                        }
+                    });
+                    
+                    increaseButton.addEventListener('click', function() {
+                        let current = parseInt(ticketQuantityInput.value);
+                        const maxTickets = 10; // Set a reasonable maximum
+                        if(current < maxTickets) {
+                            ticketQuantityInput.value = ++current;
+                            totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
+                            updateBookingUrl();
+                        }
+                    });
+                    
+                    ticketQuantityInput.addEventListener('change', function() {
+                        let current = parseInt(ticketQuantityInput.value);
+                        if(isNaN(current) || current < 1) {
+                            current = 1;
+                            ticketQuantityInput.value = 1;
+                        } else if(current > 10) {
+                            current = 10;
+                            ticketQuantityInput.value = 10;
+                        }
                         totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
-                    }
-                });
-                increaseButton.addEventListener('click', function() {
-                    let current = parseInt(ticketQuantityInput.value);
-                    ticketQuantityInput.value = ++current;
-                    totalPriceElement.textContent = '$' + (pricePerTicket * current).toFixed(2);
-                });
+                        updateBookingUrl();
+                    });
+                }
+                
+                // For multiple ticket types
+                const selectTicketTypeButtons = document.querySelectorAll('.select-ticket-type');
+                if(selectTicketTypeButtons.length > 0) {
+                    selectTicketTypeButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const ticketTypeId = this.getAttribute('data-ticket-type-id');
+                            const ticketTypeName = this.getAttribute('data-ticket-type-name');
+                            const ticketTypePrice = this.getAttribute('data-ticket-type-price');
+                            
+                            // Get current URL
+                            let url = new URL(bookTicketsBtn.href);
+                            let params = new URLSearchParams(url.search);
+                            
+                            // Update parameters
+                            params.set('ticketTypeId', ticketTypeId);
+                            params.set('ticketTypeName', ticketTypeName);
+                            params.set('total', ticketTypePrice);
+                            
+                            // Set new URL
+                            url.search = params.toString();
+                            bookTicketsBtn.href = url.toString();
+                            
+                            // Highlight selected ticket type
+                            selectTicketTypeButtons.forEach(btn => {
+                                btn.closest('.bg-gray-50').classList.remove('ring-2', 'ring-primary');
+                            });
+                            this.closest('.bg-gray-50').classList.add('ring-2', 'ring-primary');
+                        });
+                    });
+                }
             }
         });
     </script>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details - Your Tickets.lk</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#F74500', secondary: '#1F2937' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                },
+                fontFamily: {
+                    'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    'inter': ['Inter', 'sans-serif']
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-inter">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-primary">Admin Panel</h1>
+        </div>
+        <nav class="mt-10">
+            <a th:href="@{/admin/dashboard}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-dashboard-line inline mr-2"></i> Dashboard
+            </a>
+            <a th:href="@{/admin/events}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-calendar-line inline mr-2"></i> Events
+            </a>
+            <a th:href="@{/admin/payments}"
+               class="block py-2.5 px-4 rounded transition duration-200 bg-primary text-white">
+                <i class="ri-money-dollar-circle-line inline mr-2"></i> Payment Details
+            </a>
+            <a th:href="@{/admin/users}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-user-line inline mr-2"></i> Users
+            </a>
+            <a href="#"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-ticket-line inline mr-2"></i> Tickets
+            </a>
+            <!-- Logout button -->
+            <a th:href="@{/logout}"
+               class="block py-2.5 px-4 mt-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-logout-box-line inline mr-2"></i> Logout
+            </a>
+        </nav>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+        <header class="mb-8">
+            <h2 class="text-4xl font-bold text-primary">Payment Details</h2>
+        </header>
+        <!-- Payment Details Section -->
+        <section>
+            <h3 class="text-xl font-semibold mb-4">All Payments</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border">
+                    <thead>
+                    <tr class="bg-primary text-white">
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Transaction ID</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">User</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Event</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Amount</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Date</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Status</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="payment-details-table">
+                    <!-- Payment details rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="no-payments" class="text-gray-600 mt-4 hidden">No payments found.</div>
+            
+            <!-- Ticket Details Modal -->
+            <div id="ticket-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-secondary">Ticket Details</h3>
+                        <button id="close-ticket-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="ri-close-line text-2xl"></i>
+                        </button>
+                    </div>
+                    <div id="ticket-details-content" class="font-inter">
+                        <!-- Ticket details will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script th:inline="javascript">
+    // Base URL for API
+    const baseUrl = /*[[@{/}]]*/ '';
+
+    // Fetch and render payment details in table
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchPaymentDetails();
+        
+        // Set up event listeners
+        document.getElementById('close-ticket-modal').addEventListener('click', () => {
+            document.getElementById('ticket-modal').classList.add('hidden');
+        });
+    });
+
+    function fetchPaymentDetails() {
+        fetch(`${baseUrl}api/payments`)
+            .then(response => response.json())
+            .then(payments => {
+                const table = document.getElementById('payment-details-table');
+                const noPayments = document.getElementById('no-payments');
+
+                if (!payments || payments.length === 0) {
+                    noPayments.classList.remove('hidden');
+                    table.innerHTML = '';
+                    return;
+                }
+
+                noPayments.classList.add('hidden');
+                
+                // Sort payments by timestamp (newest first)
+                payments.sort((a, b) => {
+                    return (b.timestamp || 0) - (a.timestamp || 0);
+                });
+                
+                table.innerHTML = payments.map(payment => `
+                    <tr class="border-b hover:bg-gray-50 font-inter">
+                        <td class="py-2 px-4 text-sm text-gray-600">${payment.id || 'N/A'}</td>
+                        <td class="py-2 px-4 text-sm text-gray-600">${payment.userName || payment.cardName || 'Unknown'}</td>
+                        <td class="py-2 px-4 text-sm text-gray-600">${payment.eventName || 'N/A'}</td>
+                        <td class="py-2 px-4 text-sm text-gray-600">$${parseFloat(payment.total || payment.price || 0).toFixed(2)}</td>
+                        <td class="py-2 px-4 text-sm text-gray-600">${new Date(parseInt(payment.timestamp)).toLocaleString()}</td>
+                        <td class="py-2 px-4 text-sm text-gray-600">${payment.status || 'COMPLETED'}</td>
+                        <td class="py-2 px-4 text-sm">
+                            <button onclick="viewPaymentDetails('${payment.id}')" class="text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="ri-eye-line"></i>
+                            </button>
+                            <button onclick="viewTickets('${payment.id}')" class="text-green-500 hover:text-green-700 mr-2">
+                                <i class="ri-ticket-2-line"></i>
+                            </button>
+                            <button onclick="deletePayment('${payment.id}')" class="text-red-500 hover:text-red-700">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+                document.getElementById('no-payments').classList.remove('hidden');
+                document.getElementById('payment-details-table').innerHTML = '';
+            });
+    }
+
+    function viewPaymentDetails(paymentId) {
+        fetch(`${baseUrl}api/payments/${paymentId}`)
+            .then(response => response.json())
+            .then(payment => {
+                if (!payment) {
+                    alert('Payment details not found');
+                    return;
+                }
+                
+                // Format payment details for display
+                const detailsHtml = `
+                    <div class="space-y-4 font-inter">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Payment ID</p>
+                                <p class="font-medium">${payment.id || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Date & Time</p>
+                                <p class="font-medium">${new Date(parseInt(payment.timestamp)).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Customer</p>
+                                <p class="font-medium">${payment.userName || payment.cardName || 'Unknown'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Status</p>
+                                <p class="font-medium">${payment.status || 'COMPLETED'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4 mt-4">
+                            <h4 class="font-semibold mb-2">Event Details</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Event</p>
+                                    <p class="font-medium">${payment.eventName || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Event ID</p>
+                                    <p class="font-medium">${payment.eventId || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Ticket Type</p>
+                                    <p class="font-medium">${payment.ticketTypeName || 'General Admission'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Quantity</p>
+                                    <p class="font-medium">${payment.ticketCount || '1'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4 mt-4">
+                            <h4 class="font-semibold mb-2">Payment Details</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Amount</p>
+                                    <p class="font-medium">$${parseFloat(payment.total || payment.price || 0).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Payment Method</p>
+                                    <p class="font-medium">${payment.paymentMethod || 'Credit Card'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('ticket-details-content').innerHTML = detailsHtml;
+                document.getElementById('ticket-modal').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error fetching payment details:', error);
+                alert('Error fetching payment details');
+            });
+    }
+
+    function viewTickets(paymentId) {
+        fetch(`${baseUrl}api/tickets/payment/${paymentId}`)
+            .then(response => response.json())
+            .then(tickets => {
+                if (!tickets || tickets.length === 0) {
+                    alert('No tickets found for this payment');
+                    return;
+                }
+                
+                // Format tickets for display
+                const ticketsHtml = `
+                    <div class="space-y-4 font-inter">
+                        <h4 class="font-semibold mb-2">Tickets for Payment #${paymentId}</h4>
+                        ${tickets.map(ticket => `
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">${ticket.id || 'N/A'}</p>
+                                        <p class="text-sm text-gray-600">${ticket.eventName || 'Unknown Event'}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Quantity</p>
+                                        <p class="font-medium">${ticket.quantity || '1'}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-2 grid grid-cols-2 gap-2">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Type</p>
+                                        <p class="font-medium">${ticket.ticketTypeName || 'General Admission'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Price</p>
+                                        <p class="font-medium">$${parseFloat(ticket.unitPrice || 0).toFixed(2)} each</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Customer</p>
+                                        <p class="font-medium">${ticket.userName || 'Unknown'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Purchase Date</p>
+                                        <p class="font-medium">${new Date(ticket.purchaseDate).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                document.getElementById('ticket-details-content').innerHTML = ticketsHtml;
+                document.getElementById('ticket-modal').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error fetching tickets:', error);
+                alert('Error fetching tickets');
+            });
+    }
+
+    function deletePayment(paymentId) {
+        if (confirm('Are you sure you want to delete this payment? This action cannot be undone.')) {
+            fetch(`${baseUrl}api/payments/${paymentId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Payment deleted successfully!');
+                    fetchPaymentDetails();
+                } else {
+                    alert('Failed to delete payment');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting payment:', error);
+                alert('Error deleting payment');
+            });
+        }
+    }
+</script>
+</body>
+
+</html>
