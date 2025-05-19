@@ -48,6 +48,10 @@
                class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
                 <i class="ri-settings-3-line inline mr-2"></i> Tickets
             </a>
+            <a th:href="@{/admin/management}"
+               class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
+                <i class="ri-admin-line inline mr-2"></i> Admin Management
+            </a>
             <!-- Logout button -->
             <a th:href="@{/logout}"
                class="block py-2.5 px-4 mt-4 rounded transition duration-200 hover:bg-primary hover:text-white text-gray-700">
@@ -77,18 +81,18 @@
                     </a>
                 </div>
             </div>
-            
+
             <!-- Recent Users Section -->
             <div class="mt-8 p-6 bg-white rounded shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-semibold">Recent Users</h3>
                     <a th:href="@{/admin/users}" class="text-primary hover:underline">View All</a>
                 </div>
-                
+
                 <div th:if="${#lists.isEmpty(recentUsers)}" class="text-gray-600">
                     No users available.
                 </div>
-                
+
                 <div th:unless="${#lists.isEmpty(recentUsers)}" class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-100">

@@ -4,19 +4,30 @@ import com.eventticket.booking.model.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AdminService {
-    private List<Admin> admins = new ArrayList<>();
 
     @Autowired
     private FileStorageService fileStorageService;
 
     public List<Admin> getAllAdmins() {
-        return fileStorageService.readAdmins();
+        System.out.println("AdminService.getAllAdmins() called");
+        List<Admin> admins = fileStorageService.readAdmins();
+        System.out.println("Read " + admins.size() + " admins from storage");
+
+        // Create a default admin if none exists
+        if (admins.isEmpty()) {
+            System.out.println("No admins found, creating default admin");
+            Admin defaultAdmin = new Admin("admin1", "admin@yourtickets.lk", "admin123");
+            addAdmin(defaultAdmin);
+            admins = fileStorageService.readAdmins();
+            System.out.println("After adding default admin, now have " + admins.size() + " admins");
+        }
+
+        return admins;
     }
 
     public Optional<Admin> getAdminById(String adminId) {
@@ -47,6 +58,41 @@ public class AdminService {
             }
         }
         fileStorageService.writeAdmins(admins);
+    }
+
+    public Optional<Admin> authenticateAdmin(String email, String password) {
+        if (email == null || password == null) {
+            return Optional.empty();
+        }
+
+        System.out.println("Authenticating admin with email: " + email);
+        List<Admin> admins = getAllAdmins();
+        System.out.println("Current admins in system: " + admins.size());
+
+        // Print all admins for debugging
+        admins.forEach(admin ->
+            System.out.println("Admin in system: " + admin.getAdminId() + " - " + admin.getUserName() + " - " + admin.getPassword()));
+
+        Optional<Admin> adminOpt = admins.stream()
+                .filter(admin -> email.equals(admin.getUserName()))
+                .findFirst();
+
+        if (adminOpt.isPresent()) {
+            Admin admin = adminOpt.get();
+            System.out.println("Found admin with email: " + admin.getUserName());
+
+            // Check if password matches
+            if (password.equals(admin.getPassword())) {
+                System.out.println("Password matches, authentication successful");
+                return Optional.of(admin);
+            } else {
+                System.out.println("Password does not match");
+                return Optional.empty();
+            }
+        } else {
+            System.out.println("No admin found with email: " + email);
+            return Optional.empty();
+        }
     }
 
 }

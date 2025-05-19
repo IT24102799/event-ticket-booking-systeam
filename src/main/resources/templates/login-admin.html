@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,9 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-  <link rel="stylesheet" href="../style.css">
   <style>
-    body { background-color: #f9fafb; }
+    body { background-color: #f9fafb; font-family: 'Inter', sans-serif; }
     .custom-checkbox { display: inline-block; position: relative; padding-left: 30px; cursor: pointer; }
     .custom-checkbox input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
     .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #fff; border: 1px solid #d1d5db; border-radius: 4px; }
@@ -30,15 +29,19 @@
     .custom-checkbox input:checked~.checkmark { background-color: #F74500; border-color: #F74500; }
     .checkmark:after { content: ""; position: absolute; display: none; }
     .custom-checkbox input:checked~.checkmark:after { display: block; }
+    .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #9ca3af; }
   </style>
 </head>
 <body>
 <!-- Main Content Only -->
-<main class="flex items-center justify-center py-12 px-4">
+<main class="flex items-center justify-center py-12 px-4 min-h-screen">
   <div class="bg-white rounded-lg shadow-xl overflow-hidden max-w-md w-full">
     <!-- Login Form -->
     <div id="login-form" class="p-8">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
+      <div id="login-error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden">
+        <p>Invalid email or password. Please try again.</p>
+      </div>
       <form id="login-form-element">
         <div class="mb-4">
           <label for="login-email" class="block text-gray-700 font-medium mb-2">Email</label>
@@ -73,11 +76,102 @@
             <span class="checkmark"></span>
           </label>
         </div>
-        <button href="dashboard.html" type="submit" class="w-full bg-primary text-white py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-colors font-medium">Login</button>
+        <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg whitespace-nowrap hover:bg-opacity-90 transition-colors font-medium">Login</button>
       </form>
     </div>
   </div>
 </main>
-<script src=""></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('login-form-element');
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const emailError = document.getElementById('login-email-error');
+    const passwordError = document.getElementById('login-password-error');
+    const loginError = document.getElementById('login-error');
+    const passwordToggle = document.getElementById('login-password-toggle');
+
+    // Toggle password visibility
+    passwordToggle.addEventListener('click', function() {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggle.classList.remove('ri-eye-off-line');
+        passwordToggle.classList.add('ri-eye-line');
+      } else {
+        passwordInput.type = 'password';
+        passwordToggle.classList.remove('ri-eye-line');
+        passwordToggle.classList.add('ri-eye-off-line');
+      }
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Reset errors
+      emailError.classList.add('hidden');
+      passwordError.classList.add('hidden');
+      loginError.classList.add('hidden');
+
+      // Validate inputs
+      let isValid = true;
+
+      if (!emailInput.value) {
+        emailError.textContent = 'Please enter your email';
+        emailError.classList.remove('hidden');
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(emailInput.value)) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      if (!passwordInput.value) {
+        passwordError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      if (isValid) {
+        // Submit the form
+        const loginData = {
+          email: emailInput.value,
+          password: passwordInput.value
+        };
+
+        fetch('/api/admins/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Login failed');
+          }
+        })
+        .then(data => {
+          console.log('Login successful:', data);
+
+          // Store admin info in session storage if needed
+          if (document.getElementById('remember-me').checked) {
+            sessionStorage.setItem('adminId', data.adminId);
+            sessionStorage.setItem('adminEmail', data.email);
+          }
+
+          // Redirect to admin dashboard
+          window.location.href = '/admin/dashboard';
+        })
+        .catch(error => {
+          console.error('Login error:', error);
+          loginError.classList.remove('hidden');
+        });
+      }
+    });
+  });
+</script>
 </body>
 </html>

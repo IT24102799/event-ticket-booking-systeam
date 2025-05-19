@@ -12,6 +12,6 @@ import lombok.Setter;
 
 public class Admin {
     private String adminId;
-    private String userName;
+    private String userName; // This will store the email
     private String password;
 }
